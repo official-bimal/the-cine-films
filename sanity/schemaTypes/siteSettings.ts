@@ -6,6 +6,13 @@ export default defineType({
   type: "document",
   fields: [
     defineField({
+      name: "logo",
+      title: "Logo",
+      type: "image",
+      description:
+        "Shown in the nav bar and footer. Use a horizontal logo with a transparent or black background — it displays small (about 32px tall) in the nav.",
+    }),
+    defineField({
       name: "tagline",
       title: "Tagline",
       type: "string",

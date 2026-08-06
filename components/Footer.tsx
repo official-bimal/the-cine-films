@@ -1,10 +1,10 @@
-import { Camera } from "lucide-react";
 import { InstagramIcon, FacebookIcon, YoutubeIcon } from "./SocialIcons";
 import { navLinks, services, siteConfig } from "@/lib/data";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
 
 type Settings = {
+  logoUrl: string | null;
   tagline: string | null;
   socialInstagram: string | null;
   socialFacebook: string | null;
@@ -13,6 +13,7 @@ type Settings = {
 
 export default async function Footer() {
   const settings = await sanityFetch<Settings>(SITE_SETTINGS_QUERY);
+  const logoUrl = settings?.logoUrl || "/images/logo.png";
   const tagline = settings?.tagline || siteConfig.tagline;
   const social = {
     instagram: settings?.socialInstagram || siteConfig.social.instagram,
@@ -31,8 +32,8 @@ export default async function Footer() {
         <div className="grid grid-cols-1 gap-12 border-b border-line pb-14 md:grid-cols-4">
           <div className="md:col-span-2">
             <a href="#home" className="flex items-center gap-2 font-display text-xl text-offwhite">
-              <Camera className="h-5 w-5 text-gold" strokeWidth={1.5} />
-              THE CINE FILMS
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl} alt="The Cine Films" className="h-9 w-auto object-contain" />
             </a>
             <p className="mt-4 max-w-sm text-sm text-muted">
               {tagline} — Pokhara&apos;s premier production house crafting commercial
