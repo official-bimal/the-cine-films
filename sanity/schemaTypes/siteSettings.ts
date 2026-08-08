@@ -68,6 +68,19 @@ export default defineType({
         "Alternative to uploading a file above — paste a YouTube or Vimeo link instead. If both are set, the uploaded file is used.",
     }),
     defineField({
+      name: "trustedByText",
+      title: "\"Trusted By\" Bar Text",
+      type: "string",
+      description: 'Shown in a strip right under the hero, e.g. "Trusted by 50+ Clients". Leave empty to hide this bar.',
+    }),
+    defineField({
+      name: "trustedByRating",
+      title: "\"Trusted By\" Bar Star Rating",
+      type: "number",
+      options: { list: [1, 2, 3, 4, 5] },
+      initialValue: 5,
+    }),
+    defineField({
       name: "heroStats",
       title: "Hero Stats (the 3 numbers under the homepage headline)",
       type: "array",

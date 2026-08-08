@@ -15,7 +15,7 @@
     "framer-motion": "^11.0.0",
     "lenis": "^1.1.13",
     "react-countup": "^6.5.3",
-    "lucide-react": "^0.400.0",
+    "lucide-react": "^1.30.0",
     "clsx": "^2.1.1",
     "sanity": "^3.62.0",
     "next-sanity": "^9.8.0",

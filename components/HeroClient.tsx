@@ -58,8 +58,8 @@ export default function HeroClient({
       </div>
       <div className="absolute inset-0 bg-vignette" />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pt-28 lg:px-10">
-        <p className="section-label mb-6">Pokhara, Nepal — Est. 2021</p>
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-6 pt-28 text-center lg:px-10">
+        <p className="section-label mb-6 justify-center">Pokhara, Nepal — Est. 2021</p>
 
         <h1 className="font-display text-hero-mobile uppercase text-offwhite sm:text-6xl lg:text-hero-desktop">
           {HEADLINE.map((line, i) => (
@@ -80,7 +80,7 @@ export default function HeroClient({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.7 }}
-          className="mt-8 max-w-xl font-body text-base text-muted sm:text-lg"
+          className="mx-auto mt-8 max-w-xl font-body text-base text-muted sm:text-lg"
         >
           Pokhara&apos;s Premier Production House — Commercial Films{" "}
           <span className="text-gold">•</span> Music Videos{" "}
@@ -92,7 +92,7 @@ export default function HeroClient({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.7 }}
-          className="mt-10 flex flex-wrap items-center gap-5"
+          className="mt-10 flex flex-wrap items-center justify-center gap-5"
         >
           <MagneticButton
             as="button"
@@ -115,10 +115,10 @@ export default function HeroClient({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.7 }}
-          className="mt-16 flex flex-wrap gap-10 border-t border-line pt-8 sm:mt-24"
+          className="mt-16 flex flex-wrap justify-center gap-10 border-t border-line pt-8 sm:mt-24"
         >
           {heroStats.map((s) => (
-            <div key={s.label}>
+            <div key={s.label} className="text-center">
               <p className="font-display text-3xl text-gold sm:text-4xl">{s.value}</p>
               <p className="font-mono text-[11px] uppercase tracking-widest2 text-muted">
                 {s.label}

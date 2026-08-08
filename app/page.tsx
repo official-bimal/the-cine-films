@@ -1,6 +1,7 @@
 import Preloader from "@/components/Preloader";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import TrustBar from "@/components/TrustBar";
 import Marquee from "@/components/Marquee";
 import Services from "@/components/Services";
 import Portfolio from "@/components/Portfolio";
@@ -20,6 +21,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <TrustBar />
         <Marquee />
         <Services />
         <Portfolio />
