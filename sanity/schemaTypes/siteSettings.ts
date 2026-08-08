@@ -55,17 +55,18 @@ export default defineType({
     }),
     defineField({
       name: "showreelVideo",
-      title: "Showreel Video File",
+      title: "Hero Background Video",
       type: "file",
       options: { accept: "video/*" },
-      description: "Upload your showreel here. Used in the hero 'Watch Our Reel' popup.",
+      description:
+        "Plays full-bleed behind the homepage headline (autoplay, muted, looping) — and also opens in the 'Watch Our Reel' popup. Use a short (15-40s), landscape, no-dialogue clip for best results, since it loops silently.",
     }),
     defineField({
       name: "showreelUrl",
       title: "Showreel Link (YouTube / Vimeo, optional)",
       type: "url",
       description:
-        "Alternative to uploading a file above — paste a YouTube or Vimeo link instead. If both are set, the uploaded file is used.",
+        "Only used for the 'Watch Our Reel' popup (with sound/controls) — background videos must be an uploaded file above, since YouTube/Vimeo links can't autoplay muted as a page background. If both are set, the uploaded file is used for both.",
     }),
     defineField({
       name: "trustedByText",

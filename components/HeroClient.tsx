@@ -25,37 +25,41 @@ export default function HeroClient({
   return (
     <section id="home" className="relative flex min-h-screen items-center overflow-hidden bg-ink">
       {/*
-        REAL ASSET SLOT (fallback when no showreel is set in the CMS yet):
-        <video autoPlay muted loop playsInline poster="/images/hero-poster.jpg" className="absolute inset-0 h-full w-full object-cover">
-          <source src="/videos/showreel.mp4" type="video/mp4" />
-        </video>
+        REAL ASSET SLOT: this background video comes from the CMS (Site
+        Settings -> Showreel Video File, or Showreel Link) at /studio. Until
+        one is uploaded, a placeholder gradient shows instead.
       */}
-      <div className="absolute inset-0 placeholder-tile">
-        {showreelVideoUrl && (
+      {showreelVideoUrl ? (
+        <div className="absolute inset-0">
           <video
             autoPlay
             muted
             loop
             playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-40"
+            className="absolute inset-0 h-full w-full object-cover"
           >
             <source src={showreelVideoUrl} />
           </video>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-br from-charcoal via-ink to-black" />
-        <motion.div
-          aria-hidden="true"
-          className="absolute -top-1/4 -left-1/4 h-[70vh] w-[70vh] rounded-full bg-gold/10 blur-[140px]"
-          animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden="true"
-          className="absolute -bottom-1/4 -right-1/4 h-[70vh] w-[70vh] rounded-full bg-electric/10 blur-[140px]"
-          animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+          {/* Light gradient just for text legibility -- the video itself stays vivid, unlike a heavy dark overlay. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/60" />
+        </div>
+      ) : (
+        <div className="absolute inset-0 placeholder-tile">
+          <div className="absolute inset-0 bg-gradient-to-br from-charcoal via-ink to-black" />
+          <motion.div
+            aria-hidden="true"
+            className="absolute -top-1/4 -left-1/4 h-[70vh] w-[70vh] rounded-full bg-gold/10 blur-[140px]"
+            animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            aria-hidden="true"
+            className="absolute -bottom-1/4 -right-1/4 h-[70vh] w-[70vh] rounded-full bg-electric/10 blur-[140px]"
+            animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+      )}
       <div className="absolute inset-0 bg-vignette" />
 
       <div className="relative z-10 mx-auto w-full max-w-5xl px-6 pt-28 text-center lg:px-10">
