@@ -116,7 +116,7 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
             See the Work
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted">
-            Brands that arrived with a problem and left with a new standard—across marketing, production, drone, and AI.
+            Brands that arrived with a problem and left with a new standard across marketing, production, drone, and AI.
           </p>
         </ScrollReveal>
 

@@ -173,25 +173,25 @@ export const processSteps = [
   },
   {
     number: "03",
-    title: "Pre-Production Excellence",
+    title: "Pre-Production Preparation",
     description:
       "Scripts perfected. Talent aligned. Locations locked. Everything meticulously planned so production runs like clockwork.",
   },
   {
     number: "04",
-    title: "Production Magic",
+    title: "Production Execution",
     description:
       "This is where strategy becomes reality. Lights, camera, and the craft that separates good from unforgettable.",
   },
   {
     number: "05",
-    title: "Post-Production Alchemy",
+    title: "Post-Production Refinement",
     description:
       "Editing, color, sound, VFX, 3D—every frame refined until it's unmissable. This is where obsession shows.",
   },
   {
     number: "06",
-    title: "Launch Into Culture",
+    title: "Launch Into Impact",
     description:
       "Optimized for every platform, delivered to make an impact. Your idea doesn't just launch—it lands.",
   },
@@ -201,7 +201,7 @@ export const whyUs = [
   {
     title: "Marketing. First.",
     description:
-      "Most production companies dream in visuals. We think in strategy. Every film, reel, and campaign starts with research and positioning—not aesthetic.",
+      "Most production companies dream in visuals. We think in strategy. Every film, reel, and campaign starts with research and positioning not aesthetic.",
   },
   {
     title: "Strategy Before Pixels",
@@ -211,7 +211,7 @@ export const whyUs = [
   {
     title: "Production Isn't Outsourced",
     description:
-      "From concept to final pixel—we own the entire process. That means your brand voice stays consistent. Your timeline stays sane.",
+      "From concept to final pixel we own the entire process. That means your brand voice stays consistent. Your timeline stays sane.",
   },
   {
     title: "AI. For Speed, Not Shortcuts.",

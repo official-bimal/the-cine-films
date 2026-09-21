@@ -38,7 +38,8 @@ body.studio-active {
 }
 
 /* ---------- Custom cursor ---------- */
-.cursor-dot,
+/* A fine champagne ring with a slow light sweep and a soft glow. The old
+   centre dot and crosshair ticks are gone; on hover the ring swells and fills. */
 .cursor-ring {
   position: fixed;
   top: 0;
@@ -48,51 +49,51 @@ body.studio-active {
   border-radius: 50%;
   transform: translate(-50%, -50%);
   will-change: transform;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(232, 201, 122, 0.28);
+  background: radial-gradient(circle, rgba(232, 201, 122, 0.06) 0%, rgba(232, 201, 122, 0) 70%);
+  box-shadow: 0 0 22px rgba(212, 168, 83, 0.16), inset 0 0 12px rgba(212, 168, 83, 0.1);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: #d4a853;
-}
-
-.cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(212, 168, 83, 0.6);
-  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+.cursor-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(243, 220, 156, 0) 0deg,
+    rgba(243, 220, 156, 0) 210deg,
+    rgba(243, 220, 156, 0.95) 330deg,
+    rgba(255, 244, 214, 0) 360deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  animation: cursor-sweep 3.2s linear infinite;
 }
 
 .cursor-ring.cursor-hover {
-  width: 64px;
-  height: 64px;
-  background: rgba(212, 168, 83, 0.08);
-  border-color: #d4a853;
+  width: 68px;
+  height: 68px;
+  background: radial-gradient(circle, rgba(232, 201, 122, 0.16) 0%, rgba(232, 201, 122, 0.04) 70%);
+  border-color: rgba(232, 201, 122, 0.6);
+  box-shadow: 0 0 34px rgba(212, 168, 83, 0.28), inset 0 0 18px rgba(212, 168, 83, 0.16);
 }
 
-.cursor-ring::before,
-.cursor-ring::after {
-  content: "";
-  position: absolute;
-  background: rgba(212, 168, 83, 0.9);
+@keyframes cursor-sweep {
+  to { transform: rotate(360deg); }
 }
-.cursor-ring::before {
-  top: 50%;
-  left: -6px;
-  width: 4px;
-  height: 1px;
-  transform: translateY(-50%);
-}
-.cursor-ring::after {
-  left: 50%;
-  top: -6px;
-  width: 1px;
-  height: 4px;
-  transform: translateX(-50%);
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-ring::before {
+    animation: none;
+  }
 }
 
 @media (max-width: 768px) {
-  .cursor-dot,
   .cursor-ring {
     display: none;
   }

@@ -4,7 +4,7 @@ import ScrollReveal from "./ScrollReveal";
 
 export default function Services() {
   return (
-    <section id="services" className="bg-ink py-24 lg:py-32">
+    <section id="services" className="bg-ink py-24 lg:py-20 min-[1700px]:py-32">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-10">
         <ScrollReveal className="text-center">
           <p className="section-label justify-center">What We Do</p>
@@ -13,7 +13,7 @@ export default function Services() {
           </h2>
         </ScrollReveal>
 
-        <div className="mt-14 flex flex-col gap-4 lg:h-[740px] lg:flex-row lg:gap-3">
+        <div className="mx-auto mt-14 flex flex-col gap-4 lg:h-[clamp(420px,calc(100vh-15rem),640px)] lg:max-w-[1080px] lg:flex-row lg:gap-3 min-[1700px]:max-w-none">
           {serviceCategories.map((category, i) => {
             return (
             <ScrollReveal

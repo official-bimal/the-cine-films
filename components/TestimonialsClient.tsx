@@ -15,7 +15,7 @@ type Testimonial = {
   photoUrl: string | null;
 };
 
-const AUTOPLAY_MS = 3500;
+const AUTOPLAY_MS = 3000;
 
 const SPRING: Transition = { type: "spring", stiffness: 210, damping: 26, mass: 0.8 };
 // A card wrapping from one end of the row to the other snaps into place and
@@ -26,19 +26,49 @@ const TELEPORT: Transition = {
   z: { duration: 0 },
   rotateY: { duration: 0 },
   scale: { duration: 0 },
-  opacity: { duration: 0.3 },
+  filter: { duration: 0 },
+  opacity: { duration: 0.35 },
 };
 
-// Three cards with clear gaps on desktop; on smaller screens the focused card
-// is centred with its neighbours peeking in from the edges.
-type Dims = { w: number; gap: number; sideOpacity: number };
+// Five cards on desktop: a large focused card, a smaller neighbour either side,
+// then a smaller still, blurred pair tucked behind those. On smaller screens
+// only three fit, so the focused card is centred with its neighbours peeking in
+// from the edges. `farStep` is how far the outer pair sits beyond the
+// neighbours; `scales` are the focused / neighbour / outer sizes.
+type Dims = {
+  w: number;
+  gap: number;
+  farStep: number;
+  showFar: boolean;
+  sideOpacity: number;
+  scales: [number, number, number];
+};
 
 function getDims(vw: number): Dims {
-  if (vw >= 1200) return { w: 340, gap: 384, sideOpacity: 1 };
-  if (vw >= 960) return { w: 280, gap: 316, sideOpacity: 1 };
+  if (vw >= 1024) {
+    // The outer pair has to fit inside the viewport, so the cards shrink with it.
+    const w = Math.round(Math.max(240, Math.min(360, (vw / 2 - 32) / 1.75)));
+    return {
+      w,
+      gap: Math.round(w * 0.93),
+      farStep: Math.round(w * 0.58),
+      showFar: true,
+      sideOpacity: 1,
+      scales: [1.15, 0.8, 0.52],
+    };
+  }
   const w = Math.max(240, Math.min(320, vw - 72));
-  return { w, gap: Math.round(w * 0.86), sideOpacity: 0.8 };
+  return {
+    w,
+    gap: Math.round(w * 0.86),
+    farStep: 0,
+    showFar: false,
+    sideOpacity: 0.8,
+    scales: [1, 0.94, 0.78],
+  };
 }
+
+const FAR_BLUR = "blur(2.5px)";
 
 const CARD_H = 460;
 
@@ -66,6 +96,7 @@ function TestimonialCard({
   entered,
   stageIn,
   onSelect,
+  onHoverChange,
 }: {
   t: Testimonial;
   rel: number;
@@ -74,6 +105,7 @@ function TestimonialCard({
   entered: boolean;
   stageIn: boolean;
   onSelect: () => void;
+  onHoverChange: (hovering: boolean) => void;
 }) {
   const reduce = useReducedMotion();
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -85,18 +117,22 @@ function TestimonialCard({
 
   const abs = Math.abs(rel);
   const active = rel === 0;
-  const hidden = abs > 1;
+  const far = abs === 2;
+  const hidden = abs > (dims.showFar ? 2 : 1);
   const rating = clampRating(t.rating);
 
+  const opacity = hidden ? 0 : active ? 1 : dims.sideOpacity;
   const shown = {
-    x: rel * dims.gap,
+    x: abs === 0 ? 0 : Math.sign(rel) * (dims.gap + dims.farStep * (abs - 1)),
     y: active ? -10 : 0,
     z: -abs * 60,
     rotateY: rel * 14,
-    scale: 1 - abs * 0.06,
-    opacity: hidden ? 0 : active ? 1 : dims.sideOpacity,
+    scale: dims.scales[Math.min(abs, 2)],
+    // A card wrapping between the two outer slots fades in rather than popping.
+    opacity: wrapped && !reduce && opacity > 0 ? [0, opacity] : opacity,
+    filter: far ? FAR_BLUR : "blur(0px)",
   };
-  const stacked = { x: 0, y: 40, z: -120, rotateY: 0, scale: 0.85, opacity: 0 };
+  const stacked = { x: 0, y: 40, z: -120, rotateY: 0, scale: 0.85, opacity: 0, filter: "blur(0px)" };
 
   const transition: Transition = reduce
     ? { duration: 0.2 }
@@ -111,6 +147,8 @@ function TestimonialCard({
       aria-hidden={!active}
       data-cursor-hover={!active && !hidden ? "" : undefined}
       onClick={onSelect}
+      onHoverStart={() => onHoverChange(true)}
+      onHoverEnd={() => onHoverChange(false)}
       initial={stacked}
       animate={stageIn ? shown : stacked}
       transition={transition}
@@ -186,7 +224,7 @@ function TestimonialCard({
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-3xl bg-ink"
           initial={{ opacity: 0.5 }}
-          animate={{ opacity: active ? 0 : 0.5 }}
+          animate={{ opacity: active ? 0 : far ? 0.6 : 0.5 }}
           transition={{ duration: 0.3 }}
         />
       </div>
@@ -239,8 +277,6 @@ export default function TestimonialsClient({ testimonials }: { testimonials: Tes
     <section
       ref={sectionRef}
       className="relative overflow-hidden bg-charcoal/30 py-28"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       {/* Two static colour washes: brand blue behind the cards, a faint gold glow below */}
       <div
@@ -305,6 +341,7 @@ export default function TestimonialsClient({ testimonials }: { testimonials: Tes
                 dims={dims}
                 entered={entered}
                 stageIn={stageIn}
+                onHoverChange={setHovered}
                 onSelect={() => {
                   if (!panned.current && rel !== 0) setIndex(i);
                 }}

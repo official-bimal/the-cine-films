@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, X, ChevronDown } from "lucide-react";
 import { toEmbedUrl } from "@/lib/video";
 import MagneticButton from "./MagneticButton";
 
 const HEADLINE = ["WE DON'T", "JUST SHOOT.", "WE CREATE", "CINEMA."];
+const SERVICES = ["Commercial Films", "Music Videos", "3D Animation", "AI-Powered Content"];
 
 type HeroStat = { label: string; value: string };
 
@@ -33,6 +34,7 @@ export default function HeroClient({
         <div className="absolute inset-0">
           <video
             autoPlay
+            loop
             muted
             playsInline
             className="absolute inset-0 h-full w-full object-cover"
@@ -64,19 +66,10 @@ export default function HeroClient({
       )}
       <div className="absolute inset-0 bg-vignette" />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] items-center px-6 pt-28 sm:px-10 lg:px-16 xl:px-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] items-center px-6 pt-28 sm:px-10 lg:px-16 lg:pt-[6.5rem] xl:px-24">
         <div className="mx-auto w-full max-w-xl text-center lg:mx-0 lg:max-w-2xl lg:text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.1, duration: 0.7 }}
-            className="mb-6 flex items-center justify-center gap-3 lg:justify-start"
-          >
-            <span aria-hidden="true" className="hidden h-px w-10 bg-gold lg:block" />
-            <p className="section-label">Pokhara, Nepal — Est. 2021</p>
-          </motion.div>
-
-          <h1 className="font-display text-hero-mobile uppercase text-offwhite sm:text-6xl lg:text-7xl xl:text-8xl">
+          {/* From lg up, type size and vertical gaps follow viewport height so the whole hero fits in the first view on short laptop screens; the caps match the previous large-monitor sizes. */}
+          <h1 className="font-display text-hero-mobile uppercase text-offwhite sm:text-6xl lg:mt-[clamp(0.5rem,2.5vh,2rem)] lg:text-[clamp(2.75rem,9vh,6rem)] lg:leading-[1.08]">
             {HEADLINE.map((line, i) => (
               <span key={line} className="block overflow-hidden">
                 <motion.span
@@ -91,23 +84,30 @@ export default function HeroClient({
             ))}
           </h1>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3, duration: 0.7 }}
-            className="mx-auto mt-8 max-w-md font-body text-base text-muted sm:text-lg lg:mx-0"
+            className="mx-auto mt-8 max-w-xl lg:mx-0 lg:mt-[clamp(1.25rem,4vh,2.5rem)] lg:max-w-none"
           >
-            Pokhara&apos;s Premier Production House — Commercial Films{" "}
-            <span className="text-gold">•</span> Music Videos{" "}
-            <span className="text-gold">•</span> 3D Animation{" "}
-            <span className="text-gold">•</span> AI-Powered Content
-          </motion.p>
+            <p className="font-[family-name:var(--font-premium)] text-lg font-medium leading-snug tracking-[-0.01em] text-offwhite [text-shadow:0_2px_18px_rgba(0,0,0,0.7)] sm:text-xl lg:text-[clamp(1rem,2.8vh,1.5rem)]">
+              Premier production house, <span className="italic text-gold-light">made to fit your budget.</span>
+            </p>
+            <p className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-offwhite/80 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)] sm:text-[11px] lg:mt-[clamp(0.5rem,1.6vh,0.875rem)] lg:justify-start">
+              {SERVICES.map((service, i) => (
+                <Fragment key={service}>
+                  {i > 0 && <span aria-hidden="true" className="inline-block h-1 w-1 rotate-45 bg-gold" />}
+                  <span>{service}</span>
+                </Fragment>
+              ))}
+            </p>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3.2, duration: 0.7 }}
-            className="mt-10 flex flex-wrap items-center justify-center gap-5 lg:justify-start"
+            className="mt-10 flex flex-wrap items-center justify-center gap-5 lg:mt-[clamp(1.25rem,4vh,2.5rem)] lg:justify-start"
           >
             <MagneticButton
               as="button"
@@ -130,11 +130,11 @@ export default function HeroClient({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 3.5, duration: 0.7 }}
-            className="mt-16 flex flex-wrap justify-center gap-10 border-t border-line pt-8 sm:mt-20 lg:justify-start"
+            className="mt-16 flex flex-wrap justify-center gap-10 border-t border-line pt-8 sm:mt-20 lg:mt-[clamp(1.5rem,6vh,5rem)] lg:justify-start lg:pt-[clamp(1rem,3vh,2rem)]"
           >
             {heroStats.map((s) => (
               <div key={s.label} className="text-center lg:text-left">
-                <p className="font-display text-3xl text-gold sm:text-4xl">{s.value}</p>
+                <p className="font-display text-3xl text-gold sm:text-4xl lg:text-3xl min-[1536px]:text-4xl">{s.value}</p>
                 <p className="font-mono text-[11px] uppercase tracking-widest2 text-muted">
                   {s.label}
                 </p>

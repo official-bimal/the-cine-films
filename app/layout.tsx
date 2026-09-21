@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
+import { Inter, JetBrains_Mono, Cormorant_Garamond, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
@@ -22,6 +22,14 @@ const cormorant = Cormorant_Garamond({
   weight: ["500", "600"],
   style: ["normal", "italic"],
   variable: "--font-luxury",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-premium",
   display: "swap",
 });
 
@@ -93,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${cormorant.variable} ${playfair.variable}`}>
       <head>
         {/* Clash Display via Fontshare — matches brand display typography from the design brief */}
         <link

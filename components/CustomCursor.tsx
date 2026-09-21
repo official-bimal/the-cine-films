@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 export default function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const pathname = usePathname();
@@ -12,7 +11,7 @@ export default function CustomCursor() {
 
   useEffect(() => {
     // globals.css hides the OS cursor site-wide (body { cursor: none }) so
-    // this component can draw the custom dot/ring instead. On /studio we
+    // this component can draw the custom ring instead. On /studio we
     // need the real OS cursor back for the CMS dashboard's own UI.
     document.body.classList.toggle("studio-active", Boolean(isStudio));
   }, [isStudio]);
@@ -33,14 +32,11 @@ export default function CustomCursor() {
     function onMove(e: MouseEvent) {
       targetX = e.clientX;
       targetY = e.clientY;
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate(${targetX}px, ${targetY}px) translate(-50%, -50%)`;
-      }
     }
 
     function animateRing() {
-      ringX += (targetX - ringX) * 0.18;
-      ringY += (targetY - ringY) * 0.18;
+      ringX += (targetX - ringX) * 0.25;
+      ringY += (targetY - ringY) * 0.25;
       if (ringRef.current) {
         ringRef.current.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
       }
@@ -75,10 +71,5 @@ export default function CustomCursor() {
 
   if (!enabled || isStudio) return null;
 
-  return (
-    <>
-      <div ref={dotRef} className="cursor-dot" />
-      <div ref={ringRef} className="cursor-ring" />
-    </>
-  );
+  return <div ref={ringRef} className="cursor-ring" />;
 }
