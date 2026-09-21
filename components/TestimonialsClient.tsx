@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion, type Transition } from "framer-motion";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 
@@ -51,10 +52,10 @@ function getDims(vw: number): Dims {
     return {
       w,
       gap: Math.round(w * 0.93),
-      farStep: Math.round(w * 0.58),
+      farStep: Math.round(w * 0.61),
       showFar: true,
       sideOpacity: 1,
-      scales: [1.15, 0.8, 0.52],
+      scales: [1.15, 0.8, 0.58],
     };
   }
   const w = Math.max(240, Math.min(320, vw - 72));
@@ -172,10 +173,11 @@ function TestimonialCard({
         {/* Photo */}
         <div className="relative h-[190px] shrink-0 overflow-hidden rounded-2xl bg-stone-200">
           {t.photoUrl && !photoFailed ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={t.photoUrl}
               alt={t.name}
+              fill
+              sizes="330px"
               draggable={false}
               onError={() => setPhotoFailed(true)}
               className="h-full w-full object-cover object-[50%_30%]"

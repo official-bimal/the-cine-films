@@ -30,6 +30,8 @@ const config: Config = {
         body: ["var(--font-body)", "Inter", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
         luxury: ["var(--font-luxury)", "Georgia", "serif"],
+        script: ["var(--font-script)", "cursive"],
+        nav: ["var(--font-nav)", "Inter", "sans-serif"],
       },
       fontSize: {
         "hero-mobile": ["3rem", { lineHeight: "1.02", letterSpacing: "-0.02em" }],

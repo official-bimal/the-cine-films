@@ -90,8 +90,8 @@ export default function HeroClient({
             transition={{ delay: 3, duration: 0.7 }}
             className="mx-auto mt-8 max-w-xl lg:mx-0 lg:mt-[clamp(1.25rem,4vh,2.5rem)] lg:max-w-none"
           >
-            <p className="font-[family-name:var(--font-premium)] text-lg font-medium leading-snug tracking-[-0.01em] text-offwhite [text-shadow:0_2px_18px_rgba(0,0,0,0.7)] sm:text-xl lg:text-[clamp(1rem,2.8vh,1.5rem)]">
-              Premier production house, <span className="italic text-gold-light">made to fit your budget.</span>
+            <p className="font-[family-name:var(--font-premium)] text-base font-medium leading-snug tracking-[-0.01em] text-offwhite [text-shadow:0_2px_18px_rgba(0,0,0,0.7)] sm:text-lg lg:text-[clamp(0.875rem,2.3vh,1.25rem)]">
+              Premier production house, <span className="font-script text-[1.6em] font-normal leading-none tracking-normal text-gold-light">made to fit your budget.</span>
             </p>
             <p className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-offwhite/80 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)] sm:text-[11px] lg:mt-[clamp(0.5rem,1.6vh,0.875rem)] lg:justify-start">
               {SERVICES.map((service, i) => (

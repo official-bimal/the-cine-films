@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { InstagramIcon, FacebookIcon, YoutubeIcon, TiktokIcon } from "./SocialIcons";
 import { navLinks, serviceCategories, siteConfig } from "@/lib/data";
 import { sanityFetch } from "@/sanity/lib/fetch";
@@ -29,8 +30,8 @@ export default async function Footer() {
         <div className="grid grid-cols-1 gap-12 border-b border-line pb-14 md:grid-cols-4">
           <div className="md:col-span-2">
             <a href="#home" data-cursor-hover className="flex items-center gap-2 font-display text-xl text-offwhite">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoUrl} alt="The Cine Films" className="h-9 w-auto object-contain" />
+              {/* Shown 36px tall; the width/height here (2x) only size the file that gets fetched. */}
+              <Image src={logoUrl} alt="The Cine Films" width={127} height={72} className="h-9 w-auto object-contain" />
             </a>
             <p className="mt-5 font-display text-lg uppercase leading-tight text-offwhite">{tagline}</p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">

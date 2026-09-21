@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 
 // Behind-the-scenes photos of the team at work, laid out as a mosaic of differently sized tiles.
@@ -35,17 +36,21 @@ const PHOTOS = [
   { src: "/images/team/10.jpg", focus: "50% 50%", place: "col-start-2 row-start-10 row-span-3" },
 ];
 
+// Rendered widths of a one-column tile and the two-column lead tile, for the browser to pick a file size.
+const TILE_SIZES = "(min-width: 1240px) 230px, (min-width: 1024px) 18vw, 34vw";
+const LEAD_SIZES = "(min-width: 1240px) 470px, (min-width: 1024px) 37vw, 68vw";
+
 export default function WhyUsMedia() {
   return (
     <div className="mt-10 grid aspect-[1/2] grid-cols-3 grid-rows-[repeat(12,minmax(0,1fr))] gap-3 sm:aspect-[3/5]">
       {PHOTOS.map((photo, i) => (
         <ScrollReveal key={photo.src} delay={(i % 4) * 0.06} className={photo.place}>
           <div className="group relative h-full overflow-hidden rounded-xl border border-line placeholder-tile">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={photo.src}
               alt="The Cine Films team at work"
-              loading="lazy"
+              fill
+              sizes={photo.place.includes("col-span-2") ? LEAD_SIZES : TILE_SIZES}
               style={{ objectPosition: photo.focus }}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105"
             />

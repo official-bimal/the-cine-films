@@ -4,14 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 export default function CustomCursor() {
-  const ringRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const auraRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const pathname = usePathname();
   const isStudio = pathname?.startsWith("/studio");
 
   useEffect(() => {
     // globals.css hides the OS cursor site-wide (body { cursor: none }) so
-    // this component can draw the custom ring instead. On /studio we
+    // this component can draw the custom cursor instead. On /studio we
     // need the real OS cursor back for the CMS dashboard's own UI.
     document.body.classList.toggle("studio-active", Boolean(isStudio));
   }, [isStudio]);
@@ -24,52 +25,103 @@ export default function CustomCursor() {
     if (isTouch) return;
     setEnabled(true);
 
-    let ringX = 0;
-    let ringY = 0;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // How tightly the aura chases the dot: 1 = glued to it, lower = softer trail.
+    const follow = reduceMotion ? 1 : 0.35;
+    // The aura never trails more than this many px behind the dot, however fast
+    // the pointer moves, so it always reads as attached to the cursor.
+    const maxLag = 22;
+
     let targetX = 0;
     let targetY = 0;
+    let auraX = 0;
+    let auraY = 0;
+    let raf = 0;
+    let seen = false;
+
+    // The aura's lag behind the dot is a free speed meter: it grows while the
+    // pointer moves and shrinks to zero once it stops. That drives the glow.
+    function tick() {
+      auraX += (targetX - auraX) * follow;
+      auraY += (targetY - auraY) * follow;
+
+      let lag = Math.hypot(targetX - auraX, targetY - auraY);
+      if (lag > maxLag) {
+        const k = maxLag / lag;
+        auraX = targetX - (targetX - auraX) * k;
+        auraY = targetY - (targetY - auraY) * k;
+        lag = maxLag;
+      }
+
+      const energy = reduceMotion ? 0 : Math.min(lag / (maxLag * 0.8), 1);
+      const aura = auraRef.current;
+      if (aura) {
+        // `translate` (not `transform`) so the CSS `scale` on the aura pivots on its
+        // own centre instead of also scaling this offset. See .cursor-aura.
+        aura.style.translate = `${auraX}px ${auraY}px`;
+        aura.style.setProperty("--energy", energy.toFixed(3));
+      }
+
+      // Sleep once the aura has caught up, so an idle page costs nothing.
+      raf = lag < 0.1 ? 0 : requestAnimationFrame(tick);
+    }
 
     function onMove(e: MouseEvent) {
       targetX = e.clientX;
       targetY = e.clientY;
-    }
 
-    function animateRing() {
-      ringX += (targetX - ringX) * 0.25;
-      ringY += (targetY - ringY) * 0.25;
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`;
       }
-      requestAnimationFrame(animateRing);
+
+      if (!seen) {
+        // Start the aura under the pointer instead of sweeping in from (0, 0).
+        seen = true;
+        auraX = targetX;
+        auraY = targetY;
+        dotRef.current?.classList.add("cursor-ready");
+        auraRef.current?.classList.add("cursor-ready");
+      }
+
+      if (!raf) raf = requestAnimationFrame(tick);
     }
 
     function onOver(e: MouseEvent) {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-cursor-hover]")) {
-        ringRef.current?.classList.add("cursor-hover");
-      }
+      // Anything marked [data-cursor-hover] (links, buttons, cards) swaps the dot
+      // for a pointer arrow.
+      const pointer = (e.target as HTMLElement | null)?.closest?.("[data-cursor-hover]") != null;
+      dotRef.current?.classList.toggle("is-pointing", pointer);
+      auraRef.current?.classList.toggle("is-pointing", pointer);
     }
-    function onOut(e: MouseEvent) {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-cursor-hover]")) {
-        ringRef.current?.classList.remove("cursor-hover");
-      }
+
+    function onLeave() {
+      dotRef.current?.classList.remove("cursor-ready");
+      auraRef.current?.classList.remove("cursor-ready");
+      seen = false;
     }
 
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseover", onOver);
-    window.addEventListener("mouseout", onOut);
-    const raf = requestAnimationFrame(animateRing);
+    document.documentElement.addEventListener("mouseleave", onLeave);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
-      window.removeEventListener("mouseout", onOut);
+      document.documentElement.removeEventListener("mouseleave", onLeave);
       cancelAnimationFrame(raf);
     };
   }, [isStudio]);
 
   if (!enabled || isStudio) return null;
 
-  return <div ref={ringRef} className="cursor-ring" />;
+  return (
+    <>
+      <div ref={auraRef} className="cursor-aura" />
+      <div ref={dotRef} className="cursor-dot">
+        <svg className="cursor-arrow" viewBox="0 0 24 28" aria-hidden="true">
+          <path d="M2 2 L2 22 L7.5 17 L11.5 26 L15 24.5 L11 15.8 L18.5 15.8 Z" />
+        </svg>
+      </div>
+    </>
+  );
 }

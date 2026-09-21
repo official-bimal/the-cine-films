@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Plus } from "lucide-react";
 import { serviceCategories } from "@/lib/data";
 import ScrollReveal from "./ScrollReveal";
@@ -29,11 +30,11 @@ export default function Services() {
                   category.featured ? "border-gold/40" : "border-line"
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={category.image}
                   alt=""
-                  loading="lazy"
+                  fill
+                  sizes="(min-width: 1700px) 520px, (min-width: 1024px) 360px, 100vw"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105 group-focus-within:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />

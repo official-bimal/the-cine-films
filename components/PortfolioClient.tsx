@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { Play, X } from "lucide-react";
 import { filterTabs } from "@/lib/data";
 import { toEmbedUrl, youtubeThumbnails } from "@/lib/video";
@@ -36,11 +37,11 @@ function ProjectThumb({ project }: { project: Project }) {
 
   if (src) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={src}
         alt=""
-        loading="lazy"
+        fill
+        sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw"
         onError={swapToFallback}
         onLoad={(e) => e.currentTarget.naturalWidth <= 120 && swapToFallback()}
         className={imgClass}

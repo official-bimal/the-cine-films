@@ -37,64 +37,114 @@ body.studio-active {
   cursor: auto;
 }
 
+/* The browser gives links, buttons and anything with cursor-pointer their own
+   cursor, which would draw a second one on top of the custom cursor. Switch it
+   off on every element. Not on phones or /studio, which use the real cursor. */
+@media (min-width: 769px) {
+  body:not(.studio-active) *,
+  body:not(.studio-active) *::before,
+  body:not(.studio-active) *::after {
+    cursor: none !important;
+  }
+}
+
 /* ---------- Custom cursor ---------- */
-/* A fine champagne ring with a slow light sweep and a soft glow. The old
-   centre dot and crosshair ticks are gone; on hover the ring swells and fills. */
-.cursor-ring {
+/* A small gold dot that sits exactly on the pointer, with a soft golden aura
+   trailing behind it. The aura rests as a faint glow and brightens and swells
+   while the pointer moves (--energy is set from CustomCursor.tsx, 0 to 1).
+   Over anything marked [data-cursor-hover] the dot becomes a pointer arrow and
+   the aura switches off, so nothing sits on top of what you're pointing at. */
+.cursor-dot,
+.cursor-aura {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 9999;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(232, 201, 122, 0.28);
-  background: radial-gradient(circle, rgba(232, 201, 122, 0.06) 0%, rgba(232, 201, 122, 0) 70%);
-  box-shadow: 0 0 22px rgba(212, 168, 83, 0.16), inset 0 0 12px rgba(212, 168, 83, 0.1);
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0;
+  will-change: transform, translate;
 }
 
-.cursor-ring::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(243, 220, 156, 0) 0deg,
-    rgba(243, 220, 156, 0) 210deg,
-    rgba(243, 220, 156, 0.95) 330deg,
-    rgba(255, 244, 214, 0) 360deg
+/* The box is centred on its own (0, 0) with negative margins and moved with the
+   `translate` property, so `scale` grows it around its centre without also
+   scaling the offset. Don't switch this to `transform: translate(-50%, -50%)`. */
+.cursor-aura {
+  --energy: 0;
+  --dim: 1;
+  --size: 84px;
+  z-index: 9998;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  background: radial-gradient(
+    circle,
+    rgba(243, 220, 156, 0.45) 0%,
+    rgba(212, 168, 83, 0.24) 30%,
+    rgba(212, 168, 83, 0.07) 55%,
+    rgba(212, 168, 83, 0) 72%
   );
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
-  animation: cursor-sweep 3.2s linear infinite;
+  scale: calc(1 + var(--energy) * 0.2);
+  transition: opacity 0.25s ease, scale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cursor-ring.cursor-hover {
-  width: 68px;
-  height: 68px;
-  background: radial-gradient(circle, rgba(232, 201, 122, 0.16) 0%, rgba(232, 201, 122, 0.04) 70%);
-  border-color: rgba(232, 201, 122, 0.6);
-  box-shadow: 0 0 34px rgba(212, 168, 83, 0.28), inset 0 0 18px rgba(212, 168, 83, 0.16);
+.cursor-aura.cursor-ready {
+  opacity: calc((0.45 + var(--energy) * 0.55) * var(--dim));
 }
 
-@keyframes cursor-sweep {
-  to { transform: rotate(360deg); }
+/* Off while the arrow is showing: over text and photos it reads as a pale disc
+   around the arrow and gets in the way. */
+.cursor-aura.is-pointing {
+  --dim: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cursor-ring::before {
-    animation: none;
-  }
+.cursor-dot {
+  z-index: 9999;
+  width: 7px;
+  height: 7px;
+  background: #e8c97a;
+  border: 1px solid transparent;
+  box-shadow: 0 0 10px rgba(232, 201, 122, 0.85), 0 0 22px rgba(212, 168, 83, 0.45);
+  transition: opacity 0.25s ease, width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.cursor-dot.cursor-ready {
+  opacity: 1;
+}
+
+/* Pointer arrow, shown over anything hoverable. Its tip sits on the dot's centre,
+   which is the true pointer position, so clicks land where the tip points. */
+.cursor-arrow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 21px;
+  margin: -1.5px 0 0 -1.5px;
+  fill: #e8c97a;
+  stroke: rgba(5, 5, 5, 0.65);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+  opacity: 0;
+  transform: scale(0.6);
+  transform-origin: 1.5px 1.5px;
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cursor-dot.is-pointing {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cursor-dot.is-pointing .cursor-arrow {
+  opacity: 1;
+  transform: scale(1);
 }
 
 @media (max-width: 768px) {
-  .cursor-ring {
+  .cursor-dot,
+  .cursor-aura {
     display: none;
   }
 }
@@ -209,4 +259,12 @@ textarea:focus-visible {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* The booking calendar is an iframe the cursor can't follow, so hide it
+   while the pointer is over it and let the normal cursor show. */
+body.over-embed .cursor-dot,
+body.over-embed .cursor-aura {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
