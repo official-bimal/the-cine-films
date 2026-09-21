@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { InstagramIcon, FacebookIcon, YoutubeIcon } from "./SocialIcons";
+import { InstagramIcon, FacebookIcon, YoutubeIcon, TiktokIcon } from "./SocialIcons";
 import { budgetOptions, serviceOptions } from "@/lib/data";
 import ScrollReveal from "./ScrollReveal";
 import MagneticButton from "./MagneticButton";
@@ -13,7 +13,7 @@ type ContactInfo = {
   phone: string;
   email: string;
   address: string;
-  social: { instagram: string; facebook: string; youtube: string };
+  social: { instagram: string; facebook: string; youtube: string; tiktok: string };
 };
 
 export default function ContactClient({ contact }: { contact: ContactInfo }) {
@@ -30,20 +30,20 @@ export default function ContactClient({ contact }: { contact: ContactInfo }) {
   }
 
   return (
-    <section id="contact" className="bg-charcoal/30 py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <ScrollReveal className="text-center">
-          <p className="section-label">06 — Let&apos;s Create</p>
-          <h2 className="mt-4 font-display text-4xl uppercase leading-[0.95] text-offwhite sm:text-5xl lg:text-6xl">
+    <section id="contact" className="bg-ink py-24 lg:py-32">
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10">
+        <ScrollReveal>
+          <p className="section-label">Let&apos;s Create</p>
+          <h2 className="mt-4 max-w-2xl font-display text-4xl uppercase leading-[0.95] text-offwhite sm:text-5xl">
             Ready To Tell Your Story?
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-muted">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
             Drop us a message and let&apos;s bring your vision to life.
           </p>
         </ScrollReveal>
 
-        <div className="mt-16 grid grid-cols-1 gap-14 lg:grid-cols-5">
-          <ScrollReveal className="lg:col-span-3">
+        <div className="mt-16 grid grid-cols-1 gap-14 lg:grid-cols-12">
+          <ScrollReveal className="lg:col-span-7">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field label="Full Name" name="name" required />
@@ -83,27 +83,48 @@ export default function ContactClient({ contact }: { contact: ContactInfo }) {
             </form>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.1} className="lg:col-span-2">
-            <div className="space-y-6 rounded-xl border border-line bg-surface p-8">
-              <ContactRow icon={Phone} label="Phone" value={contact.phone} />
-              <ContactRow icon={Mail} label="Email" value={contact.email} />
+          <ScrollReveal delay={0.1} className="lg:col-span-5">
+            <ul className="border-b border-line">
+              <ContactRow icon={Phone} label="Phone" value={contact.phone} href={`tel:${contact.phone}`} />
+              <ContactRow icon={Mail} label="Email" value={contact.email} href={`mailto:${contact.email}`} />
               <ContactRow icon={MapPin} label="Location" value={contact.address} />
+            </ul>
 
-              <div className="border-t border-line pt-6">
-                <p className="mb-4 font-mono text-[11px] uppercase tracking-widest2 text-muted">
-                  Follow Us
-                </p>
-                <div className="flex gap-4">
-                  <a href={contact.social.instagram} data-cursor-hover className="text-muted hover:text-gold">
-                    <InstagramIcon className="h-5 w-5" />
-                  </a>
-                  <a href={contact.social.facebook} data-cursor-hover className="text-muted hover:text-gold">
-                    <FacebookIcon className="h-5 w-5" />
-                  </a>
-                  <a href={contact.social.youtube} data-cursor-hover className="text-muted hover:text-gold">
-                    <YoutubeIcon className="h-5 w-5" />
-                  </a>
-                </div>
+            <div className="pt-10">
+              <p className="font-mono text-[11px] uppercase tracking-widest2 text-gold">Follow Us</p>
+              <div className="mt-5 flex gap-5">
+                <a
+                  href={contact.social.instagram}
+                  aria-label="Instagram"
+                  data-cursor-hover
+                  className="text-muted transition-colors hover:text-gold"
+                >
+                  <InstagramIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href={contact.social.facebook}
+                  aria-label="Facebook"
+                  data-cursor-hover
+                  className="text-muted transition-colors hover:text-gold"
+                >
+                  <FacebookIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href={contact.social.youtube}
+                  aria-label="YouTube"
+                  data-cursor-hover
+                  className="text-muted transition-colors hover:text-gold"
+                >
+                  <YoutubeIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href={contact.social.tiktok}
+                  aria-label="TikTok"
+                  data-cursor-hover
+                  className="text-muted transition-colors hover:text-gold"
+                >
+                  <TiktokIcon className="h-5 w-5" />
+                </a>
               </div>
             </div>
           </ScrollReveal>
@@ -175,18 +196,31 @@ function ContactRow({
   icon: Icon,
   label,
   value,
+  href,
 }: {
   icon: typeof Phone;
   label: string;
   value: string;
+  href?: string;
 }) {
-  return (
-    <div className="flex items-start gap-4">
-      <Icon strokeWidth={1.5} className="mt-0.5 h-5 w-5 text-gold" />
+  const content = (
+    <>
+      <Icon strokeWidth={1.5} className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
       <div>
         <p className="font-mono text-[10px] uppercase tracking-widest2 text-muted">{label}</p>
-        <p className="text-sm text-offwhite">{value}</p>
+        <p className="mt-1 text-base text-offwhite">{value}</p>
       </div>
-    </div>
+    </>
+  );
+  return (
+    <li className="border-t border-line py-6 first:border-t-0">
+      {href ? (
+        <a href={href} data-cursor-hover className="group flex items-start gap-4">
+          {content}
+        </a>
+      ) : (
+        <div className="flex items-start gap-4">{content}</div>
+      )}
+    </li>
   );
 }

@@ -1,5 +1,5 @@
-import { InstagramIcon, FacebookIcon, YoutubeIcon } from "./SocialIcons";
-import { navLinks, services, siteConfig } from "@/lib/data";
+import { InstagramIcon, FacebookIcon, YoutubeIcon, TiktokIcon } from "./SocialIcons";
+import { navLinks, serviceCategories, siteConfig } from "@/lib/data";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
 
@@ -9,6 +9,7 @@ type Settings = {
   socialInstagram: string | null;
   socialFacebook: string | null;
   socialYoutube: string | null;
+  socialTiktok: string | null;
 };
 
 export default async function Footer() {
@@ -19,34 +20,34 @@ export default async function Footer() {
     instagram: settings?.socialInstagram || siteConfig.social.instagram,
     facebook: settings?.socialFacebook || siteConfig.social.facebook,
     youtube: settings?.socialYoutube || siteConfig.social.youtube,
+    tiktok: settings?.socialTiktok || siteConfig.social.tiktok,
   };
 
   return (
-    <footer className="relative border-t border-line bg-ink pt-16">
-      <div
-        aria-hidden="true"
-        className="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(90deg,#D4A853_0px,#D4A853_10px,transparent_10px,transparent_20px)] opacity-30"
-      />
-
-      <div className="mx-auto max-w-7xl px-6 pb-10 lg:px-10">
+    <footer className="border-t border-line bg-ink pt-16">
+      <div className="mx-auto max-w-[1240px] px-6 pb-10 lg:px-10">
         <div className="grid grid-cols-1 gap-12 border-b border-line pb-14 md:grid-cols-4">
           <div className="md:col-span-2">
-            <a href="#home" className="flex items-center gap-2 font-display text-xl text-offwhite">
+            <a href="#home" data-cursor-hover className="flex items-center gap-2 font-display text-xl text-offwhite">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={logoUrl} alt="The Cine Films" className="h-9 w-auto object-contain" />
             </a>
-            <p className="mt-4 max-w-sm text-sm text-muted">
-              {tagline} — Pokhara&apos;s premier production house crafting commercial
-              films, music videos, and AI-powered content for brands across Nepal.
+            <p className="mt-5 font-display text-lg uppercase leading-tight text-offwhite">{tagline}</p>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
+              We&apos;re the marketing team that also shoots films. Built for brands with ambition.
             </p>
           </div>
 
           <div>
-            <h4 className="font-mono text-xs uppercase tracking-widest2 text-gold">Quick Links</h4>
-            <ul className="mt-4 space-y-3">
+            <p className="section-label">Quick Links</p>
+            <ul className="mt-5 space-y-3">
               {navLinks.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} className="text-sm text-muted transition-colors hover:text-offwhite">
+                  <a
+                    href={l.href}
+                    data-cursor-hover
+                    className="text-sm text-muted transition-colors hover:text-offwhite"
+                  >
                     {l.label}
                   </a>
                 </li>
@@ -55,11 +56,17 @@ export default async function Footer() {
           </div>
 
           <div>
-            <h4 className="font-mono text-xs uppercase tracking-widest2 text-gold">Services</h4>
-            <ul className="mt-4 space-y-3">
-              {services.slice(0, 5).map((s) => (
-                <li key={s.number} className="text-sm text-muted">
-                  {s.name}
+            <p className="section-label">Services</p>
+            <ul className="mt-5 space-y-3">
+              {serviceCategories.map((c) => (
+                <li key={c.title}>
+                  <a
+                    href="#services"
+                    data-cursor-hover
+                    className="text-sm text-muted transition-colors hover:text-offwhite"
+                  >
+                    {c.title}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -71,14 +78,17 @@ export default async function Footer() {
             © 2026 The Cine Films. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
-            <a href={social.instagram} aria-label="Instagram" data-cursor-hover className="text-muted hover:text-gold">
+            <a href={social.instagram} aria-label="Instagram" data-cursor-hover className="text-muted transition-colors hover:text-gold">
               <InstagramIcon className="h-5 w-5" />
             </a>
-            <a href={social.facebook} aria-label="Facebook" data-cursor-hover className="text-muted hover:text-gold">
+            <a href={social.facebook} aria-label="Facebook" data-cursor-hover className="text-muted transition-colors hover:text-gold">
               <FacebookIcon className="h-5 w-5" />
             </a>
-            <a href={social.youtube} aria-label="YouTube" data-cursor-hover className="text-muted hover:text-gold">
+            <a href={social.youtube} aria-label="YouTube" data-cursor-hover className="text-muted transition-colors hover:text-gold">
               <YoutubeIcon className="h-5 w-5" />
+            </a>
+            <a href={social.tiktok} aria-label="TikTok" data-cursor-hover className="text-muted transition-colors hover:text-gold">
+              <TiktokIcon className="h-5 w-5" />
             </a>
           </div>
           <p className="font-mono text-xs text-muted">

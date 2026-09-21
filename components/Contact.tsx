@@ -10,6 +10,7 @@ type Settings = {
   socialInstagram: string | null;
   socialFacebook: string | null;
   socialYoutube: string | null;
+  socialTiktok: string | null;
 };
 
 export default async function Contact() {
@@ -23,6 +24,7 @@ export default async function Contact() {
       instagram: settings?.socialInstagram || siteConfig.social.instagram,
       facebook: settings?.socialFacebook || siteConfig.social.facebook,
       youtube: settings?.socialYoutube || siteConfig.social.youtube,
+      tiktok: settings?.socialTiktok || siteConfig.social.tiktok,
     },
   };
 

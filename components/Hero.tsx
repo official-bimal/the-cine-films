@@ -19,7 +19,7 @@ export default async function Hero() {
   return (
     <HeroClient
       heroStats={heroStats}
-      showreelVideoUrl={settings?.showreelVideoUrl || null}
+      showreelVideoUrl={settings?.showreelVideoUrl || "/video/The%20cinefilms00.mp4"}
       showreelUrl={settings?.showreelUrl || null}
     />
   );

@@ -16,7 +16,7 @@ export default defineType({
       title: "Category",
       type: "string",
       options: {
-        list: ["Commercials", "Music Videos", "Corporate", "3D", "Drone"],
+        list: ["Marketing", "Drone", "Production", "AI"],
       },
       validation: (Rule) => Rule.required(),
     }),
@@ -35,7 +35,7 @@ export default defineType({
       title: "Thumbnail Image",
       type: "image",
       options: { hotspot: true },
-      description: "Shows in the portfolio grid.",
+      description: "Optional. Shows on the project card. If left empty, the YouTube thumbnail (or a frame from the uploaded video) is used.",
     }),
     defineField({
       name: "video",

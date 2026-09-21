@@ -145,6 +145,25 @@ body.studio-active {
   }
 }
 
+/* ---------- Trusted-by brand ticker (scrolls left to right) ---------- */
+@keyframes trust-scroll {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.trust-track {
+  display: flex;
+  width: max-content;
+  animation: trust-scroll 70s linear infinite;
+}
+.trust-marquee:hover .trust-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trust-track {
+    animation-duration: 240s;
+  }
+}
+
 /* ---------- Scrollbar ---------- */
 ::-webkit-scrollbar {
   width: 8px;
