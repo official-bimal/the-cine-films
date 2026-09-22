@@ -25,7 +25,7 @@ export default async function Testimonials() {
           role: t.role,
           company: t.company,
           rating: t.rating,
-          photoUrl: null,
+          photoUrl: t.photoUrl,
         }));
 
   return <TestimonialsClient testimonials={testimonials} />;

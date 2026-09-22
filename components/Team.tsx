@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { InstagramIcon } from "./SocialIcons";
 import { team as placeholderTeam } from "@/lib/data";
 import { sanityFetch } from "@/sanity/lib/fetch";
@@ -33,8 +34,13 @@ export default async function Team() {
               >
                 <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-line placeholder-tile grayscale transition-all duration-500 group-hover:grayscale-0">
                   {member.photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={member.photoUrl} alt={member.name} className="h-full w-full object-cover" />
+                    <Image
+                      src={member.photoUrl}
+                      alt={member.name}
+                      fill
+                      sizes="(min-width: 1024px) 190px, (min-width: 640px) 30vw, 46vw"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center font-display text-3xl text-muted/40">
                       {member.name.split(" ").map((n) => n[0]).join("")}

@@ -1,58 +1,73 @@
-import { Star } from "lucide-react";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { SITE_SETTINGS_QUERY, BRANDS_QUERY } from "@/sanity/lib/queries";
-import { brands as placeholderBrands, heroStats } from "@/lib/data";
+import { clientLogos } from "@/lib/data";
 
-type Settings = { trustedByText: string | null; trustedByRating: number | null };
-type Brand = { _id: string; name: string; logoUrl: string | null };
+type Settings = { trustedByText: string | null };
+type CmsBrand = { _id: string; name: string; logoUrl: string | null };
+type Logo = { key: string; name: string; src: string | null; height: number; tint: boolean };
+
+const EDGE_FADE = "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)";
+const MIN_ITEMS_PER_GROUP = 16;
+
+function LogoGroup({ logos, hidden = false }: { logos: Logo[]; hidden?: boolean }) {
+  return (
+    <ul className="flex shrink-0 items-center" aria-hidden={hidden || undefined}>
+      {logos.map((logo) => (
+        <li key={logo.key} className="flex items-center">
+          {logo.src ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logo.src}
+              alt={hidden ? "" : logo.name}
+              style={{ height: logo.height }}
+              className={`mx-12 w-auto max-w-[240px] object-contain transition-transform duration-500 hover:scale-110 md:mx-24 ${
+                logo.tint ? "brightness-0 invert" : ""
+              }`}
+            />
+          ) : (
+            <span className="mx-12 whitespace-nowrap font-luxury text-2xl font-semibold uppercase tracking-[0.32em] text-offwhite transition-colors duration-500 hover:text-gold md:mx-24 md:text-4xl">
+              {logo.name}
+            </span>
+          )}
+          <span aria-hidden="true" className="h-2 w-2 shrink-0 rotate-45 bg-gold/70" />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default async function TrustBar() {
   const [settings, cmsBrands] = await Promise.all([
     sanityFetch<Settings>(SITE_SETTINGS_QUERY),
-    sanityFetch<Brand[]>(BRANDS_QUERY),
+    sanityFetch<CmsBrand[]>(BRANDS_QUERY),
   ]);
 
-  // Falls back to the "Brands" hero stat count if no custom text is set in
-  // the CMS, so this bar never shows up empty.
-  const fallbackCount = heroStats.find((s) => s.label === "Brands")?.value ?? "50+";
-  const text = settings?.trustedByText || `Trusted by ${fallbackCount} Clients`;
-  const rating = settings?.trustedByRating ?? 5;
+  const text = settings?.trustedByText || "Brands We've Worked With";
 
-  const logos: Brand[] =
+  const base: Omit<Logo, "key">[] =
     cmsBrands && cmsBrands.length > 0
-      ? cmsBrands.slice(0, 7)
-      : placeholderBrands.slice(0, 7).map((name, i) => ({ _id: `placeholder-${i}`, name, logoUrl: null }));
+      ? cmsBrands.map((b) => ({ name: b.name, src: b.logoUrl, height: 44, tint: true }))
+      : clientLogos.map((c) => ({ name: c.name, src: c.logo, height: c.height, tint: false }));
+
+  // Repeat the set so one group is always wider than the screen, keeping the loop seamless.
+  const repeat = Math.max(1, Math.ceil(MIN_ITEMS_PER_GROUP / base.length));
+  const logos: Logo[] = Array.from({ length: repeat }).flatMap((_, r) =>
+    base.map((b, i) => ({ ...b, key: `${i}-${r}` }))
+  );
 
   return (
-    <div className="relative z-10 border-y border-line bg-charcoal/40 py-8">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-6 lg:px-10">
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <p className="font-mono text-xs uppercase tracking-widest2 text-offwhite">{text}</p>
-          <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={i < rating ? "h-3.5 w-3.5 fill-gold text-gold" : "h-3.5 w-3.5 text-line"}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 opacity-70">
-          {logos.map((brand) =>
-            brand.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={brand._id}
-                src={brand.logoUrl}
-                alt={brand.name}
-                className="h-6 max-w-[110px] object-contain grayscale"
-              />
-            ) : (
-              <span key={brand._id} className="font-display text-sm uppercase tracking-wide text-muted">
-                {brand.name}
-              </span>
-            )
-          )}
+    <div className="relative z-10 border-y border-line bg-charcoal/40 py-16 md:py-20">
+      <p className="px-6 text-center font-mono text-sm uppercase tracking-widest2 text-offwhite md:text-base">
+        {text}
+      </p>
+
+      <div
+        className="trust-marquee mt-12 flex overflow-hidden"
+        style={{ maskImage: EDGE_FADE, WebkitMaskImage: EDGE_FADE }}
+      >
+        <div className="trust-track">
+          <LogoGroup logos={logos} />
+          <LogoGroup logos={logos} hidden />
         </div>
       </div>
     </div>

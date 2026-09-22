@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Camera, Menu, X } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -46,11 +47,11 @@ export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
               e.preventDefault();
               handleLinkClick("#home");
             }}
-            className="flex items-center gap-2 font-display text-lg tracking-tight text-offwhite"
+            className="flex items-center gap-2 font-nav text-lg font-medium uppercase tracking-[0.22em] text-offwhite"
           >
             {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="The Cine Films" className="h-8 w-auto object-contain" />
+              // Shown 32px tall; the width/height here (2x) only size the file that gets fetched.
+              <Image src={logoUrl} alt="The Cine Films" width={113} height={64} priority className="h-8 w-auto object-contain" />
             ) : (
               <>
                 <Camera className="h-5 w-5 text-gold" strokeWidth={1.5} />
@@ -69,7 +70,7 @@ export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
                     e.preventDefault();
                     handleLinkClick(link.href);
                   }}
-                  className="font-mono text-xs uppercase tracking-widest2 text-muted transition-colors hover:text-gold"
+                  className="font-nav text-[13px] font-normal uppercase tracking-[0.24em] text-muted transition-colors hover:text-gold"
                 >
                   {link.label}
                 </a>
@@ -81,7 +82,7 @@ export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
             <MagneticButton
               href="#contact"
               onClick={() => handleLinkClick("#contact")}
-              className="rounded-full border border-gold px-6 py-2.5 font-mono text-xs uppercase tracking-widest2 text-gold transition-colors hover:bg-gold hover:text-ink"
+              className="rounded-full border border-gold px-6 py-2.5 font-nav text-[13px] font-medium uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
             >
               Get a Quote
             </MagneticButton>

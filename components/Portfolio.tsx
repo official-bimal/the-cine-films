@@ -25,9 +25,10 @@ export default async function Portfolio() {
           category: p.category,
           client: p.client,
           year: p.year,
+          // No thumbnail set, so each card shows its YouTube video's own thumbnail.
           thumbnailUrl: null,
           videoUrl: null,
-          externalVideoUrl: null,
+          externalVideoUrl: p.externalVideoUrl,
         }));
 
   return <PortfolioClient projects={projects} />;

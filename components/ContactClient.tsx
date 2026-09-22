@@ -1,192 +1,69 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { Mail, MapPin, Phone } from "lucide-react";
-import { InstagramIcon, FacebookIcon, YoutubeIcon } from "./SocialIcons";
-import { budgetOptions, serviceOptions } from "@/lib/data";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import ScrollReveal from "./ScrollReveal";
-import MagneticButton from "./MagneticButton";
 
-type Status = "idle" | "submitting" | "success" | "error";
+// The booking calendar is loaded on demand (see below), so the Cal.com script
+// stays out of the initial page bundle.
+const CalEmbed = dynamic(() => import("./CalEmbed"), { ssr: false });
 
-type ContactInfo = {
-  phone: string;
-  email: string;
-  address: string;
-  social: { instagram: string; facebook: string; youtube: string };
-};
+// Start loading the calendar this far before the section scrolls into view.
+const LOAD_MARGIN = "800px 0px";
 
-export default function ContactClient({ contact }: { contact: ContactInfo }) {
-  const [status, setStatus] = useState<Status>("idle");
+export default function ContactClient() {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [loadCalendar, setLoadCalendar] = useState(false);
 
-  // NOTE: This is a placeholder submit handler. Wire this up to EmailJS or
-  // Resend (per the design brief) by replacing the setTimeout below with a
-  // real API call, e.g. POST to an /api/contact route that sends via Resend.
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("submitting");
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setStatus("success");
-  }
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame || typeof IntersectionObserver === "undefined") {
+      setLoadCalendar(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setLoadCalendar(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: LOAD_MARGIN }
+    );
+    observer.observe(frame);
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove("over-embed");
+    };
+  }, []);
 
   return (
-    <section id="contact" className="bg-charcoal/30 py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <ScrollReveal className="text-center">
-          <p className="section-label">06 — Let&apos;s Create</p>
-          <h2 className="mt-4 font-display text-4xl uppercase leading-[0.95] text-offwhite sm:text-5xl lg:text-6xl">
-            Ready To Tell Your Story?
+    <section id="contact" className="bg-ink py-24 lg:py-32">
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10">
+        <ScrollReveal>
+          <p className="section-label">Let&apos;s Create</p>
+          <h2 className="mt-4 max-w-2xl font-display text-4xl uppercase leading-[0.95] text-offwhite sm:text-5xl">
+            Good Stories Don&apos;t Sit in a Queue.
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-muted">
-            Drop us a message and let&apos;s bring your vision to life.
+          <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
+            We take on a limited number of projects each month. Grab a slot
+            below while one&apos;s open.
           </p>
         </ScrollReveal>
 
-        <div className="mt-16 grid grid-cols-1 gap-14 lg:grid-cols-5">
-          <ScrollReveal className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <Field label="Full Name" name="name" required />
-                <Field label="Email Address" name="email" type="email" required />
-              </div>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <Field label="Phone Number" name="phone" type="tel" />
-                <SelectField label="Service Needed" name="service" options={serviceOptions} />
-              </div>
-              <SelectField label="Project Budget Range" name="budget" options={budgetOptions} />
-              <div>
-                <label className="mb-2 block font-mono text-[11px] uppercase tracking-widest2 text-muted">
-                  Project Description
-                </label>
-                <textarea
-                  name="description"
-                  rows={5}
-                  className="w-full rounded-lg border border-line bg-surface px-4 py-3 text-sm text-offwhite outline-none transition-colors focus:border-gold"
-                  placeholder="Tell us about your project..."
-                />
-              </div>
-
-              <MagneticButton
-                as="button"
-                type="submit"
-                disabled={status === "submitting"}
-                className="w-full justify-center rounded-full bg-gold px-8 py-4 font-mono text-xs uppercase tracking-widest2 text-ink transition-opacity hover:opacity-90 disabled:opacity-60 sm:w-auto"
-              >
-                {status === "submitting" ? "Sending..." : "Send Message"}
-              </MagneticButton>
-
-              {status === "success" && (
-                <p className="font-mono text-xs text-gold">
-                  Thanks — we&apos;ll be in touch shortly.
-                </p>
-              )}
-            </form>
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.1} className="lg:col-span-2">
-            <div className="space-y-6 rounded-xl border border-line bg-surface p-8">
-              <ContactRow icon={Phone} label="Phone" value={contact.phone} />
-              <ContactRow icon={Mail} label="Email" value={contact.email} />
-              <ContactRow icon={MapPin} label="Location" value={contact.address} />
-
-              <div className="border-t border-line pt-6">
-                <p className="mb-4 font-mono text-[11px] uppercase tracking-widest2 text-muted">
-                  Follow Us
-                </p>
-                <div className="flex gap-4">
-                  <a href={contact.social.instagram} data-cursor-hover className="text-muted hover:text-gold">
-                    <InstagramIcon className="h-5 w-5" />
-                  </a>
-                  <a href={contact.social.facebook} data-cursor-hover className="text-muted hover:text-gold">
-                    <FacebookIcon className="h-5 w-5" />
-                  </a>
-                  <a href={contact.social.youtube} data-cursor-hover className="text-muted hover:text-gold">
-                    <YoutubeIcon className="h-5 w-5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
+        <ScrollReveal className="mt-14">
+          {/* The calendar is an iframe, so the custom cursor can't follow the pointer
+              over it; hide the ring there and let the normal cursor show. */}
+          <div
+            ref={frameRef}
+            onMouseEnter={() => document.body.classList.add("over-embed")}
+            onMouseLeave={() => document.body.classList.remove("over-embed")}
+            className="min-h-[560px] overflow-hidden rounded-3xl border border-line bg-surface"
+          >
+            {loadCalendar && <CalEmbed />}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  required = false,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <div>
-      <label className="mb-2 block font-mono text-[11px] uppercase tracking-widest2 text-muted">
-        {label}
-      </label>
-      <input
-        name={name}
-        type={type}
-        required={required}
-        className="w-full rounded-lg border border-line bg-surface px-4 py-3 text-sm text-offwhite outline-none transition-colors focus:border-gold"
-      />
-    </div>
-  );
-}
-
-function SelectField({
-  label,
-  name,
-  options,
-}: {
-  label: string;
-  name: string;
-  options: string[];
-}) {
-  return (
-    <div>
-      <label className="mb-2 block font-mono text-[11px] uppercase tracking-widest2 text-muted">
-        {label}
-      </label>
-      <select
-        name={name}
-        defaultValue=""
-        className="w-full rounded-lg border border-line bg-surface px-4 py-3 text-sm text-offwhite outline-none transition-colors focus:border-gold"
-      >
-        <option value="" disabled>
-          Select an option
-        </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function ContactRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Phone;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-4">
-      <Icon strokeWidth={1.5} className="mt-0.5 h-5 w-5 text-gold" />
-      <div>
-        <p className="font-mono text-[10px] uppercase tracking-widest2 text-muted">{label}</p>
-        <p className="text-sm text-offwhite">{value}</p>
-      </div>
-    </div>
   );
 }
