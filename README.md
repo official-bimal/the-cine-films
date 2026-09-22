@@ -1,6 +1,8 @@
 # The Cine Films — Website
 
-A cinematic, dark-themed Next.js 14 (App Router) site for **The Cine Films**, a video production house in Pokhara, Nepal. Built from the design brief: preloader, sticky nav, full-screen hero, brand marquee, services bento grid, filterable portfolio with lightbox, scroll-driven process timeline, why-us section, animated stats, equipment showcase, testimonial carousel, team grid, and a contact form — with a film-grain overlay, custom crosshair cursor, and Framer Motion / Lenis scroll animations throughout.
+A cinematic, dark-themed Next.js 14 (App Router) site for **The Cine Films**, a video production house in Pokhara, Nepal. Preloader, sticky nav, full-screen hero, brand marquee, services bento grid, filterable portfolio with lightbox, scroll-driven process timeline, why-us section, animated stats, testimonial carousel, team grid, and a Cal.com booking section — with a film-grain overlay, custom crosshair cursor, and Framer Motion / Lenis scroll animations throughout.
+
+Content (portfolio, clients, team, testimonials, site-wide settings) is managed through a custom **/admin content dashboard**, backed by PostgreSQL — no third-party CMS.
 
 ## Stack
 
@@ -8,70 +10,70 @@ A cinematic, dark-themed Next.js 14 (App Router) site for **The Cine Films**, a 
 - Tailwind CSS (custom cinematic theme: `ink` / `charcoal` / `gold` / `electric`)
 - Framer Motion (scroll reveals, page/menu transitions, magnetic buttons)
 - Lenis (smooth scroll)
-- react-countup (animated stats)
+- PostgreSQL + Prisma ORM
+- Custom admin authentication (bcrypt-hashed passwords, signed session cookie via `jose`)
+- Local-filesystem media storage (`lib/services/media.ts`), swappable for S3/R2/Vercel Blob later without touching the rest of the app
+- Zod (server-side validation on every admin mutation)
+- Cal.com embed (booking, replaces a traditional contact form — see "Contact" below)
 - lucide-react (icons)
-- Sanity (headless CMS, embedded content dashboard at `/studio`)
 - Fonts: Clash Display (Fontshare, display headings) + Inter (body) + JetBrains Mono (labels/accents)
 
 ## Getting started
 
+### 1. Database
+
+This project targets PostgreSQL. For local development, the easiest path is Prisma's built-in local Postgres server — no Docker or manual install required:
+
 ```bash
-npm install
-npm run dev     # http://localhost:3000
-npm run build   # production build
-npm start        # serve the production build
+npx prisma dev
 ```
 
-## ⚠️ This launches with placeholder content — most of it you now upload via the dashboard
+Leave that running in its own terminal. It prints a `DATABASE_URL` and `SHADOW_DATABASE_URL` — copy both into `.env.local` (see `.env.local.example`). For a real deployment, point `DATABASE_URL` at a managed Postgres instance (Neon, Supabase, RDS, etc.) instead.
 
-Every video, photo, logo, and testimonial in this build starts as a **placeholder** so the structure, layout, and animations can be reviewed today. Most of it is now replaceable through the **Content Dashboard** at `/studio` (see below) — no code editing needed. A couple of one-time brand assets are still code/file-based:
+### 2. Install, migrate, seed
 
-| What | How to add it |
-|---|---|
-| Showreel video, portfolio clips/thumbnails, client logos, team photos, testimonials | Upload via the **Content Dashboard** (`/studio`) — see below |
-| Phone, email, address, social links, hero stats, stats counters | Edit in **Site Settings** inside the Content Dashboard |
-| Brand logo (SVG) in the nav/footer | `/public/images/logo.svg` — `components/Nav.tsx`, `components/Footer.tsx` |
-| Open Graph image | `/public/images/og-cover.jpg` — `app/layout.tsx` |
-| Favicon | `/app/favicon.ico` — already present (default) — replace with real mark |
+```bash
+npm install
+cp .env.local.example .env.local   # fill in DATABASE_URL, AUTH_SECRET, and the admin seed credentials
+npx prisma migrate dev              # creates the schema
+npm run db:seed                     # creates the first admin account + migrates the original placeholder content
+```
 
-Services, process steps, and equipment list still live in **`lib/data.ts`** — edit that file to update them (see "Not yet CMS-managed" below).
+`npm run db:seed` is idempotent — safe to re-run.
 
-## Contact form
+### 3. Run
 
-The form in `components/Contact.tsx` currently simulates a submission client-side. To make it functional, wire it to **Resend** or **EmailJS** as specified in the brief:
+```bash
+npm run dev
+```
 
-- **Resend**: create an `app/api/contact/route.ts` POST handler that calls the Resend API, then replace the `setTimeout` in `handleSubmit` with a `fetch("/api/contact", { method: "POST", body: ... })` call.
-- **EmailJS**: install `@emailjs/browser` and call `emailjs.send(...)` directly inside `handleSubmit`.
+Visit `http://localhost:3000` for the site, or `http://localhost:3000/admin/login` for the content dashboard — sign in with the `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD` from your `.env.local`, then change the password immediately from **Admin Account** in the sidebar.
 
-You'll need an API key/service ID from whichever provider you choose — store it in `.env.local` (never commit it).
+## Content Dashboard (`/admin`)
 
-## Content Dashboard (CMS)
+The site has a built-in, custom-built content dashboard — no third-party CMS, no separate login provider. Once you're signed in at `/admin`, you can:
 
-The site has a built-in content dashboard powered by **Sanity** — a free, hosted CMS with its own login. Once it's connected, you (the company owner) can log in at `yoursite.com/studio` and add/edit content directly, no code required:
+- **Site Settings** — logo, tagline, contact info, social links, the hero showreel video/link, hero stats, and SEO defaults (title, description, OG image).
+- **Portfolio** — create/edit/delete projects, reorder them, and set each to Draft or Published (only Published projects appear on the live site). Each project takes an uploaded thumbnail/video or a YouTube/Vimeo link.
+- **Clients** — the scrolling logo marquee. Add/edit/delete, reorder, mark active/inactive.
+- **Team** — team member cards. Add/edit/delete, reorder, mark active/inactive.
+- **Testimonials** — the testimonial carousel. Add/edit/delete, reorder, Draft/Published, star rating.
+- **Media Library** — every uploaded image/video in one place, reusable across the modules above.
+- **Admin Account** — change your password.
 
-- **Portfolio Projects (Our Work)** — title, category, client, year, thumbnail image, and either an uploaded video file or a YouTube/Vimeo link.
-- **Clients / Brand Logos** — the scrolling marquee near the top of the site.
-- **Team Members** — name, role, photo, Instagram link.
-- **Testimonials** — quote, name, role, company, star rating, photo.
-- **Site Settings** — phone, email, address, social links, the showreel video, the 3 hero stats, and the 6-number stats section.
+**Not CMS-managed** (still edited in `lib/data.ts`, since they change rarely): the 12 services, the 6-step process, and the "Why Us" points. Nothing prevents moving these into the dashboard later the same way the sections above were, but there's no evidence yet that they need to be editable without a code change.
 
-### One-time setup
+## Media
 
-1. Go to **sanity.io** and sign up for a free account (email login, no credit card).
-2. Create a new project — call it "The Cine Films" — and note the **Project ID** it gives you.
-3. In the project folder, copy `.env.local.example` to a new file named `.env.local`, and fill in:
-   ```
-   NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id-here
-   NEXT_PUBLIC_SANITY_DATASET=production
-   ```
-4. Also add your local dev URL as an allowed origin: in the Sanity dashboard, go to **API → CORS Origins** and add `http://localhost:3000` (and later your live domain, e.g. `https://thecinefilms.com`), both with "Allow credentials" checked.
-5. Run `npm run dev` and open `http://localhost:3000/studio` — log in with the same account you used to sign up, and you'll see the dashboard described above.
+Uploads (logos, photos, thumbnails, videos) are validated (type + size) and stored under `public/uploads/` with a content-addressed filename, so a re-upload of the same file reuses the same URL and the immutable 1-year cache header is always safe. `lib/services/media.ts` is the only file that touches the filesystem — swapping in S3/R2/Vercel Blob later means rewriting that one file, not the admin UI or the database schema (`MediaAsset` just stores a URL + metadata).
 
-That's it — once you add content in `/studio`, it appears on the live site automatically (content refreshes within about a minute; no rebuild needed).
+## Contact
 
-**How it stays safe:** every section on the site falls back to the built-in placeholder content in `lib/data.ts` if the CMS is empty, not yet connected, or briefly unreachable — the live site can never end up blank or broken because of a CMS issue.
+The "Let's Create" section is a **Cal.com booking embed** (`components/CalEmbed.tsx`), not a traditional contact form — the booking link is set in that file. There's no message inbox; a real form with stored submissions would be new functionality, not something migrated from an earlier version of the site.
 
-**Not yet CMS-managed** (still edited in `lib/data.ts`, since they change rarely): the 12 services, the 6-step process, the "Why Us" points, and the equipment list. These can be moved into the CMS later the same way the sections above were, if you'd like.
+## Authentication
+
+`/admin/*` is protected by a signed, httpOnly session cookie (`lib/auth/session.ts`), checked both at the edge (`middleware.ts`, fast redirect) and on the server for every page and every mutating action (`lib/auth/guard.ts`) — hiding a button in the UI is never the only thing standing between a visitor and a mutation. Passwords are hashed with bcrypt. There's a single `ADMIN` role today; nothing in the current scope needs multiple roles, but the schema (`AdminUser.role`) leaves room to add them later without a rewrite.
 
 ## Deployment
 
@@ -83,14 +85,25 @@ vercel
 
 Before going live:
 
-1. Connect the `thecinefilms.com` domain in Vercel and enable HTTPS (automatic).
-2. Add Google Analytics 4 + Meta Pixel snippets (e.g. via `next/script` in `app/layout.tsx`).
-3. Verify the site in Google Search Console and submit `/sitemap.xml` (already generated via `app/sitemap.ts`).
-4. Swap the placeholder `metadataBase` URL in `app/layout.tsx` if the final domain differs.
-5. Replace all placeholder assets per the table above.
-6. Test on real mobile devices, especially hero video autoplay/loop behavior on slow connections (a poster image fallback slot is already wired in).
+1. Point `DATABASE_URL` at a managed Postgres instance and run `npx prisma migrate deploy`.
+2. Set `AUTH_SECRET` to a freshly generated value (never reuse the one from `.env.local.example` or your dev `.env.local`).
+3. Run `npm run db:seed` once against production to create the real admin account, then log in and change the password immediately.
+4. Connect the `thecinefilms.com` domain in Vercel and enable HTTPS (automatic).
+5. Fill in **Site Settings** in `/admin` — logo, real phone number, SEO title/description, and an OG image (1200×630) — before sharing the site anywhere.
+6. Note: uploaded media is stored on local disk (`public/uploads/`) by default, which does **not** persist across Vercel deployments/serverless instances. Swap `lib/services/media.ts`'s storage provider for S3/R2/Vercel Blob before relying on uploads in production.
+7. Add Google Analytics 4 + Meta Pixel snippets (e.g. via `next/script` in `app/layout.tsx`) if wanted — not included.
+8. Verify the site in Google Search Console and submit `/sitemap.xml` (generated via `app/sitemap.ts`).
+9. Test on real mobile devices, especially hero video autoplay/loop behavior on slow connections.
 
-## Notes on fidelity to the brief
+## Scripts
 
-- Some brief items were intentionally simplified for this first-pass scaffold: no Three.js/Spline 3D scene, no live EmailJS/Resend integration for the contact form, no GA4/Meta Pixel snippets yet — these need real API keys/accounts from The Cine Films to configure safely. The content dashboard (Sanity) is fully wired up — see "Content Dashboard (CMS)" above.
-- Custom cursor, film grain, marquee, scroll-triggered reveals, magnetic buttons, count-up stats, and `prefers-reduced-motion` handling are all implemented and working.
+```bash
+npm run dev           # start dev server
+npm run build          # production build (runs `prisma generate` first)
+npm run start           # run the production build
+npm run lint             # ESLint
+npm run db:migrate        # create/apply a migration in development
+npm run db:deploy          # apply migrations in production (non-interactive)
+npm run db:seed              # seed/re-seed placeholder content + admin account
+npm run db:studio             # Prisma Studio (visual DB browser)
+```

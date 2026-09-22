@@ -1,18 +1,17 @@
 import Image from "next/image";
 import { InstagramIcon } from "./SocialIcons";
-import { team as placeholderTeam } from "@/lib/data";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { TEAM_QUERY } from "@/sanity/lib/queries";
+import { getActiveTeamMembers } from "@/lib/repositories/team";
 import ScrollReveal from "./ScrollReveal";
 
-type Member = { _id: string; name: string; role: string; instagram: string | null; photoUrl: string | null };
-
 export default async function Team() {
-  const cmsTeam = await sanityFetch<Member[]>(TEAM_QUERY);
-  const team: Member[] =
-    cmsTeam && cmsTeam.length > 0
-      ? cmsTeam
-      : placeholderTeam.map((m, i) => ({ _id: `placeholder-${i}`, name: m.name, role: m.role, instagram: m.instagram, photoUrl: null }));
+  const members = await getActiveTeamMembers();
+  const team = members.map((m) => ({
+    _id: m.id,
+    name: m.name,
+    role: m.role ?? "",
+    instagram: m.instagram,
+    photoUrl: m.photoUrl,
+  }));
 
   return (
     <section className="bg-ink py-28">

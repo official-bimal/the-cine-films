@@ -4,6 +4,8 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import FilmGrain from "@/components/FilmGrain";
+import { getSiteSettings } from "@/lib/repositories/site-settings";
+import { siteConfig } from "@/lib/data";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -51,71 +53,89 @@ const jost = Jost({
 
 const siteUrl = "https://thecinefilms.com";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "The Cine Films — Premier Video Production House in Pokhara, Nepal",
-  description:
-    "The Cine Films is Pokhara's leading production house specializing in commercial video production, music videos, TVC, drone videography, 3D animation, and AI-powered content for brands across Nepal.",
-  keywords: [
-    "video production Pokhara",
-    "production house Nepal",
-    "music video production Pokhara",
-    "commercial video Nepal",
-    "drone videography Pokhara",
-    "3D animation Nepal",
-    "AI video production",
-    "TVC production Nepal",
-    "corporate film Pokhara",
-    "The Cine Films",
-  ],
-  openGraph: {
-    title: "The Cine Films — Premier Video Production House in Pokhara, Nepal",
-    description:
-      "Commercial films, music videos, TVCs, drone videography, 3D animation and AI-powered content — crafted cinematically in Pokhara, Nepal.",
-    url: siteUrl,
-    siteName: "The Cine Films",
-    images: [{ url: "/images/og-cover.jpg", width: 1200, height: 630 }],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "The Cine Films — Premier Video Production House in Pokhara, Nepal",
-    description:
-      "Pokhara's premier production house — commercial films, music videos, 3D animation & AI-powered content.",
-    images: ["/images/og-cover.jpg"],
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+const DEFAULT_TITLE = "The Cine Films — Premier Video Production House in Pokhara, Nepal";
+const DEFAULT_DESCRIPTION =
+  "The Cine Films is Pokhara's leading production house specializing in commercial video production, music videos, TVC, drone videography, 3D animation, and AI-powered content for brands across Nepal.";
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  additionalType: "https://schema.org/VideoProductionCompany",
-  name: "The Cine Films",
-  description:
-    "Premier video production house in Pokhara, Nepal specializing in commercial films, music videos, TVCs, drone videography, 3D animation and AI-powered content.",
-  url: siteUrl,
-  telephone: "+977-XXXXXXXXXX",
-  email: "info@thecinefilms.com",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Pokhara",
-    addressRegion: "Kaski",
-    addressCountry: "NP",
-  },
-  sameAs: [
-    "https://instagram.com/thecinefilms__",
-  ],
-};
+// SEO title/description/OG image now come from Site Settings (editable in
+// /admin) instead of being hardcoded — Phase 1 audit Section 18/19 flagged
+// this as static and the OG image as broken (referencing a file that didn't
+// exist). generateMetadata() can be async, so this reads the database
+// directly rather than needing a separate fetch layer.
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const title = settings?.seoTitle || DEFAULT_TITLE;
+  const description = settings?.seoDescription || DEFAULT_DESCRIPTION;
+  // Only include an OG/Twitter image if one is actually configured — an
+  // absent image is invisible; a configured-but-missing file (the old bug)
+  // shows a broken image on every share.
+  const images = settings?.ogImageUrl ? [{ url: settings.ogImageUrl, width: 1200, height: 630 }] : undefined;
 
-export default function RootLayout({
+  return {
+    metadataBase: new URL(siteUrl),
+    title,
+    description,
+    keywords: [
+      "video production Pokhara",
+      "production house Nepal",
+      "music video production Pokhara",
+      "commercial video Nepal",
+      "drone videography Pokhara",
+      "3D animation Nepal",
+      "AI video production",
+      "TVC production Nepal",
+      "corporate film Pokhara",
+      "The Cine Films",
+    ],
+    openGraph: {
+      title,
+      description,
+      url: siteUrl,
+      siteName: "The Cine Films",
+      images,
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: images?.map((i) => i.url),
+    },
+    icons: {
+      icon: "/favicon.ico",
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    additionalType: "https://schema.org/VideoProductionCompany",
+    name: "The Cine Films",
+    description: settings?.seoDescription || DEFAULT_DESCRIPTION,
+    url: siteUrl,
+    // Falls back to the code-level default rather than shipping a literal
+    // placeholder like "+977-XXXXXXXXXX" — Phase 1 audit Section 19/34: fill
+    // in the real number in Site Settings before launch.
+    telephone: settings?.phone || siteConfig.phone,
+    email: settings?.email || siteConfig.email,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Pokhara",
+      addressRegion: "Kaski",
+      addressCountry: "NP",
+    },
+    sameAs: [settings?.socialInstagram || siteConfig.social.instagram].filter(Boolean),
+  };
+
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${cormorant.variable} ${playfair.variable} ${pinyon.variable} ${jost.variable}`}>
       <head>

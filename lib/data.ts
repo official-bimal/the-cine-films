@@ -1,8 +1,17 @@
 // ---------------------------------------------------------------------------
-// PLACEHOLDER CONTENT
-// Every array/object in this file is placeholder data so the site can be
-// previewed with the correct structure and layout. Swap these values (and
-// the referenced /public assets) with real Cine Films content before launch.
+// STATIC ENGINEERING CONFIGURATION
+//
+// Everything in this file is code-owned content that changes rarely and
+// doesn't need a database row: navigation links, the services/process/why-us
+// copy, and small default values a few components fall back to if Site
+// Settings hasn't been filled in yet.
+//
+// Portfolio projects, clients/brand logos, team members, and testimonials
+// used to live here as CMS-fallback placeholders (Phase 1 of this project,
+// when the site was on Sanity). They're now real rows in the database —
+// see prisma/seed.ts for the one-time migration of that placeholder content,
+// and lib/repositories/* for how components read it. Don't add that kind of
+// content back here; it belongs in the database and the /admin dashboard.
 // ---------------------------------------------------------------------------
 
 export const siteConfig = {
@@ -30,22 +39,21 @@ export const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
+// Used by components/Hero.tsx only when Site Settings has no hero stats set.
 export const heroStats = [
   { label: "Projects", value: "200+" },
   { label: "Brands", value: "50+" },
   { label: "Years", value: "5+" },
 ];
 
-// Client logos shown in the "Trusted by" ticker until brands are added in the CMS.
-// White-on-transparent client marks in public/images/clients/.
-// `height` (px) balances the optical weight of each mark.
+// Used by components/TrustBar.tsx only when there are no active Clients in
+// the database. White-on-transparent client marks in public/images/clients/.
 export const clientLogos = [
   { name: "Nike", logo: "/images/clients/nike.png", height: 46 },
   { name: "Adidas", logo: "/images/clients/adidas.png", height: 58 },
   { name: "BYD", logo: "/images/clients/byd.png", height: 30 },
   { name: "Himalayan Java", logo: "/images/clients/himalayan-java.png", height: 78 },
 ];
-
 
 export type Service = {
   number: string;
@@ -60,7 +68,6 @@ export type ServiceCategory = {
   tag: string;
   description: string;
   featured?: boolean;
-  // REAL ASSET SLOT: swap the file in public/images/services/ for real photography.
   image: string;
   services: Service[];
 };
@@ -112,10 +119,10 @@ export const serviceCategories: ServiceCategory[] = [
   },
 ];
 
-export const services: Service[] = serviceCategories.flatMap((c) => c.services);
+const services: Service[] = serviceCategories.flatMap((c) => c.services);
 
 // Add-ons (like drone) are offered on top of a project, so they aren't counted as core services.
-export const coreServiceCount = services.filter((s) => !s.addOn).length;
+const coreServiceCount = services.filter((s) => !s.addOn).length;
 
 // PLACEHOLDER figures for the "in numbers" block under the brands strip — confirm before launch.
 export const proofPoints = [
@@ -127,35 +134,8 @@ export const proofPoints = [
   { value: "1", label: "Vision", tagline: "Yours, told cinematically" },
 ];
 
-export type ProjectCategory = "Marketing" | "Drone" | "Production" | "AI";
-
-export type Project = {
-  title: string;
-  category: ProjectCategory;
-  client: string;
-  year: string;
-  externalVideoUrl: string;
-};
-
-// PLACEHOLDER videos: real YouTube uploads from major channels (Red Bull, GoPro, ARRI, Apple,
-// BBC Earth, DJI, OpenAI, Google) until real project videos are added in the CMS.
-// Cards show each video's own YouTube thumbnail.
-
-export const projects: Project[] = [
-  { title: "Fewa Sunrise Campaign", category: "Marketing", client: "Himalayan Java", year: "2026", externalVideoUrl: "https://www.youtube.com/watch?v=raiFrxbHxV0" },
-  { title: "Above the Annapurnas", category: "Drone", client: "Pokhara Tourism Board", year: "2025", externalVideoUrl: "https://www.youtube.com/watch?v=D_vOqkEgmY0" },
-  { title: "Peaks & Echoes", category: "Production", client: "Everest Beats", year: "2026", externalVideoUrl: "https://www.youtube.com/watch?v=jF5_0HMlZNE" },
-  { title: "Product in Motion", category: "AI", client: "Gurkha Outfitters", year: "2025", externalVideoUrl: "https://www.youtube.com/watch?v=HK6y8DAPN_0" },
-  { title: "Brewed in Sarangkot", category: "Marketing", client: "Sarangkot Coffee", year: "2025", externalVideoUrl: "https://www.youtube.com/watch?v=0VfW6-1DM8Y" },
-  { title: "Skyline Reels", category: "Drone", client: "Machapuchare Media", year: "2024", externalVideoUrl: "https://www.youtube.com/watch?v=FV8_3osQgl4" },
-  { title: "Lakeside Nights", category: "Production", client: "Lakeside Collective", year: "2025", externalVideoUrl: "https://www.youtube.com/watch?v=OAqBEQ3m0fI" },
-  { title: "Render & Reveal", category: "AI", client: "Peace Pagoda Films", year: "2024", externalVideoUrl: "https://www.youtube.com/watch?v=gzneGhpXwjU" },
-  { title: "Startup Sprint", category: "Marketing", client: "Nepal Startups", year: "2024", externalVideoUrl: "https://www.youtube.com/watch?v=3bRgp_GSyBQ" },
-  { title: "Echoes of the Valley", category: "Drone", client: "Fewa Ventures", year: "2024", externalVideoUrl: "https://www.youtube.com/watch?v=6dnqGrSKudM" },
-  { title: "The Trail Ahead", category: "Production", client: "Trek & Trail Co.", year: "2025", externalVideoUrl: "https://www.youtube.com/watch?v=V3dbG9pAi8I" },
-  { title: "Banking, Reimagined", category: "AI", client: "Annapurna Bank", year: "2024", externalVideoUrl: "https://www.youtube.com/watch?v=mH7lNroRUiY" },
-];
-
+// Matches lib/validations/portfolio.ts's PROJECT_CATEGORIES — kept in sync
+// manually since one is a display list and the other is a validated enum.
 export const filterTabs = ["All", "Marketing", "Drone", "Production", "AI"];
 
 export const processSteps = [
@@ -223,73 +203,4 @@ export const whyUs = [
     description:
       "We started in Pokhara building obsessions on tight budgets. Now in Kathmandu doing the same. We know how to make small brands sound and look like big ones.",
   },
-];
-
-// Placeholder portraits: free Pexels photos of Nepali people, cropped and stored in
-// /public/images/testimonials. The names and quotes are placeholders too — replace
-// all of it with real clients (upload each photo on the Testimonial in /studio).
-export const testimonials = [
-  {
-    quote: "The Cine Films turned our product launch into something people actually wanted to watch twice. Every frame felt intentional.",
-    name: "Anjali Gurung",
-    role: "Marketing Lead",
-    company: "Himalayan Java",
-    rating: 5,
-    photoUrl: "/images/testimonials/anjali-gurung.jpg",
-  },
-  {
-    quote: "They understood our sound before we finished explaining it. The music video exceeded what we imagined.",
-    name: "Rohit Thapa",
-    role: "Artist",
-    company: "Everest Beats",
-    rating: 5,
-    photoUrl: "/images/testimonials/rohit-thapa.jpg",
-  },
-  {
-    quote: "Professional, fast, and genuinely creative. Our corporate film finally looks like the company we actually are.",
-    name: "Sabina Karki",
-    role: "Founder",
-    company: "Trek & Trail Co.",
-    rating: 5,
-    photoUrl: "/images/testimonials/sabina-karki.jpg",
-  },
-  {
-    quote: "The drone footage of the lake at sunrise is still the best marketing asset we own.",
-    name: "Prakash Bhattarai",
-    role: "Tourism Officer",
-    company: "Pokhara Tourism Board",
-    rating: 5,
-    photoUrl: "/images/testimonials/prakash-bhattarai.jpg",
-  },
-  {
-    quote: "From the first call to the final grade, they treated our brand like their own. The campaign film is now the first thing customers mention.",
-    name: "Mina Tamang",
-    role: "Founder",
-    company: "Lumbini Living",
-    rating: 5,
-    photoUrl: "/images/testimonials/mina-tamang.jpg",
-  },
-  {
-    quote: "They caught the small moments we would have missed. Watching the film felt like living the whole day over again.",
-    name: "Ritu Sharma",
-    role: "Founder",
-    company: "Sanjhi Weddings",
-    rating: 5,
-    photoUrl: "/images/testimonials/ritu-sharma.jpg",
-  },
-];
-
-export const team = [
-  { name: "Sujan Adhikari", role: "Founder / Director", instagram: "https://instagram.com/thecinefilms__" },
-  { name: "Nisha Rai", role: "Creative Producer", instagram: "https://instagram.com/thecinefilms__" },
-  { name: "Bikash Shrestha", role: "Cinematographer", instagram: "https://instagram.com/thecinefilms__" },
-  { name: "Prisha Gurung", role: "Editor / Colorist", instagram: "https://instagram.com/thecinefilms__" },
-  { name: "Aarav Basnet", role: "3D Artist", instagram: "https://instagram.com/thecinefilms__" },
-  { name: "Manisha KC", role: "Drone Pilot", instagram: "https://instagram.com/thecinefilms__" },
-];
-
-export const serviceOptions = [...services.map((s) => s.name), "Other"];
-
-export const budgetOptions = [
-  "Under NPR 50K", "NPR 50K – 1L", "NPR 1L – 3L", "NPR 3L+", "Not Sure Yet",
 ];

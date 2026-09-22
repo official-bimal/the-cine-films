@@ -31,19 +31,19 @@ body {
   }
 }
 
-/* Sanity Studio dashboard lives at /studio — it needs the real OS cursor
+/* The content dashboard lives at /admin — it needs the real OS cursor
    and isn't part of the marketing site's visual theme. */
-body.studio-active {
+body.admin-active {
   cursor: auto;
 }
 
 /* The browser gives links, buttons and anything with cursor-pointer their own
    cursor, which would draw a second one on top of the custom cursor. Switch it
-   off on every element. Not on phones or /studio, which use the real cursor. */
+   off on every element. Not on phones or /admin, which use the real cursor. */
 @media (min-width: 769px) {
-  body:not(.studio-active) *,
-  body:not(.studio-active) *::before,
-  body:not(.studio-active) *::after {
+  body:not(.admin-active) *,
+  body:not(.admin-active) *::before,
+  body:not(.admin-active) *::after {
     cursor: none !important;
   }
 }

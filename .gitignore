@@ -26,10 +26,18 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
 
 # vercel
 .vercel
+
+# admin-uploaded media (local filesystem storage provider, lib/services/media.ts)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# prisma local dev database
+/prisma/dev.db*
 
 # typescript
 *.tsbuildinfo

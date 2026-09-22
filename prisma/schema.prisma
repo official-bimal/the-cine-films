@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum AdminRole {
+  ADMIN
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         AdminRole @default(ADMIN)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ============================================================
+// CONTENT
+// ============================================================
+
+// Singleton: always the single row with id "singleton" (enforced by the
+// repository layer, see lib/repositories/site-settings.ts).
+model SiteSettings {
+  id               String   @id @default("singleton")
+  logoUrl          String?
+  tagline          String?
+  phone            String?
+  email            String?
+  address          String?
+  socialInstagram  String?
+  socialFacebook   String?
+  socialYoutube    String?
+  socialTiktok     String?
+  showreelVideoUrl String?
+  showreelUrl      String?
+  trustedByText    String?
+  // Array of { label: string, value: string } — small, fixed-shape, not
+  // worth a separate relational table.
+  heroStats        Json?
+  seoTitle         String?
+  seoDescription   String?
+  ogImageUrl       String?
+  updatedAt        DateTime @updatedAt
+}
+
+model PortfolioProject {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  category         String
+  client           String?
+  year             String?
+  description      String?
+  thumbnailUrl     String?
+  videoUrl         String?
+  externalVideoUrl String?
+  order            Int           @default(0)
+  status           PublishStatus @default(DRAFT)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status, order])
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String?
+  photoUrl  String?
+  instagram String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+}
+
+model Testimonial {
+  id        String        @id @default(cuid())
+  quote     String
+  name      String
+  role      String?
+  company   String?
+  rating    Int           @default(5)
+  photoUrl  String?
+  order     Int           @default(0)
+  status    PublishStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status, order])
+}
+
+// Every uploaded file, independent of which entity currently references it —
+// backs the admin Media Library so an asset can be browsed/reused across
+// Portfolio/Clients/Team/Testimonials/Site Settings rather than uploaded once
+// per module.
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  mimeType  String
+  size      Int
+  altText   String?
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+}

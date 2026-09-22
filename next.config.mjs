@@ -3,10 +3,6 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "cdn.sanity.io",
-      },
-      {
         // YouTube's own video thumbnails, used for portfolio cards.
         protocol: "https",
         hostname: "i.ytimg.com",
@@ -18,11 +14,6 @@ const nextConfig = {
     minimumCacheTTL: 86400,
   },
   poweredByHeader: false,
-  // Required for the embedded Sanity Studio (/studio), which uses
-  // styled-components internally.
-  compiler: {
-    styledComponents: true,
-  },
   async headers() {
     return [
       {
@@ -39,6 +30,14 @@ const nextConfig = {
         // video needs a NEW file name (e.g. cinefilms-showreel-2.mp4), not a
         // replacement of the old file.
         source: "/video/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Admin-uploaded media (lib/services/media.ts) is written with a
+        // content-addressed filename, so it's always safe to cache forever.
+        source: "/uploads/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],

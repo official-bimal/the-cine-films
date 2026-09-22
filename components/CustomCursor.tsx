@@ -8,18 +8,18 @@ export default function CustomCursor() {
   const auraRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const pathname = usePathname();
-  const isStudio = pathname?.startsWith("/studio");
+  const isAdmin = pathname?.startsWith("/admin");
 
   useEffect(() => {
     // globals.css hides the OS cursor site-wide (body { cursor: none }) so
-    // this component can draw the custom cursor instead. On /studio we
-    // need the real OS cursor back for the CMS dashboard's own UI.
-    document.body.classList.toggle("studio-active", Boolean(isStudio));
-  }, [isStudio]);
+    // this component can draw the custom cursor instead. On /admin we
+    // need the real OS cursor back for the dashboard's own UI.
+    document.body.classList.toggle("admin-active", Boolean(isAdmin));
+  }, [isAdmin]);
 
   useEffect(() => {
-    // The Sanity Studio dashboard needs the real OS cursor for its own UI.
-    if (isStudio) return;
+    // The admin dashboard needs the real OS cursor for its own UI.
+    if (isAdmin) return;
 
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     if (isTouch) return;
@@ -110,9 +110,9 @@ export default function CustomCursor() {
       document.documentElement.removeEventListener("mouseleave", onLeave);
       cancelAnimationFrame(raf);
     };
-  }, [isStudio]);
+  }, [isAdmin]);
 
-  if (!enabled || isStudio) return null;
+  if (!enabled || isAdmin) return null;
 
   return (
     <>

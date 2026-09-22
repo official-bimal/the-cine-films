@@ -1,9 +1,7 @@
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { SITE_SETTINGS_QUERY, BRANDS_QUERY } from "@/sanity/lib/queries";
+import { getSiteSettings } from "@/lib/repositories/site-settings";
+import { getActiveClients } from "@/lib/repositories/clients";
 import { clientLogos } from "@/lib/data";
 
-type Settings = { trustedByText: string | null };
-type CmsBrand = { _id: string; name: string; logoUrl: string | null };
 type Logo = { key: string; name: string; src: string | null; height: number; tint: boolean };
 
 const EDGE_FADE = "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)";
@@ -37,16 +35,13 @@ function LogoGroup({ logos, hidden = false }: { logos: Logo[]; hidden?: boolean 
 }
 
 export default async function TrustBar() {
-  const [settings, cmsBrands] = await Promise.all([
-    sanityFetch<Settings>(SITE_SETTINGS_QUERY),
-    sanityFetch<CmsBrand[]>(BRANDS_QUERY),
-  ]);
+  const [settings, clients] = await Promise.all([getSiteSettings(), getActiveClients()]);
 
   const text = settings?.trustedByText || "Brands We've Worked With";
 
   const base: Omit<Logo, "key">[] =
-    cmsBrands && cmsBrands.length > 0
-      ? cmsBrands.map((b) => ({ name: b.name, src: b.logoUrl, height: 44, tint: true }))
+    clients.length > 0
+      ? clients.map((c) => ({ name: c.name, src: c.logoUrl, height: 44, tint: true }))
       : clientLogos.map((c) => ({ name: c.name, src: c.logo, height: c.height, tint: false }));
 
   // Repeat the set so one group is always wider than the screen, keeping the loop seamless.

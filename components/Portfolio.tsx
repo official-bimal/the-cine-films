@@ -1,35 +1,21 @@
-import { projects as placeholderProjects } from "@/lib/data";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { PROJECTS_QUERY } from "@/sanity/lib/queries";
+import { getPublishedProjects } from "@/lib/repositories/portfolio";
 import PortfolioClient from "./PortfolioClient";
 
-type Project = {
-  _id: string;
-  title: string;
-  category: string;
-  client: string | null;
-  year: string | null;
-  thumbnailUrl: string | null;
-  videoUrl: string | null;
-  externalVideoUrl: string | null;
-};
-
 export default async function Portfolio() {
-  const cms = await sanityFetch<Project[]>(PROJECTS_QUERY);
-  const projects: Project[] =
-    cms && cms.length > 0
-      ? cms
-      : placeholderProjects.map((p, i) => ({
-          _id: `placeholder-${i}`,
-          title: p.title,
-          category: p.category,
-          client: p.client,
-          year: p.year,
-          // No thumbnail set, so each card shows its YouTube video's own thumbnail.
-          thumbnailUrl: null,
-          videoUrl: null,
-          externalVideoUrl: p.externalVideoUrl,
-        }));
+  const projects = await getPublishedProjects();
 
-  return <PortfolioClient projects={projects} />;
+  return (
+    <PortfolioClient
+      projects={projects.map((p) => ({
+        _id: p.id,
+        title: p.title,
+        category: p.category,
+        client: p.client,
+        year: p.year,
+        thumbnailUrl: p.thumbnailUrl,
+        videoUrl: p.videoUrl,
+        externalVideoUrl: p.externalVideoUrl,
+      }))}
+    />
+  );
 }

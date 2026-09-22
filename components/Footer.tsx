@@ -1,20 +1,10 @@
 import Image from "next/image";
 import { InstagramIcon, FacebookIcon, YoutubeIcon, TiktokIcon } from "./SocialIcons";
 import { navLinks, serviceCategories, siteConfig } from "@/lib/data";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
-
-type Settings = {
-  logoUrl: string | null;
-  tagline: string | null;
-  socialInstagram: string | null;
-  socialFacebook: string | null;
-  socialYoutube: string | null;
-  socialTiktok: string | null;
-};
+import { getSiteSettings } from "@/lib/repositories/site-settings";
 
 export default async function Footer() {
-  const settings = await sanityFetch<Settings>(SITE_SETTINGS_QUERY);
+  const settings = await getSiteSettings();
   const logoUrl = settings?.logoUrl || "/images/logo.png";
   const tagline = settings?.tagline || siteConfig.tagline;
   const social = {

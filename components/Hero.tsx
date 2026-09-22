@@ -1,20 +1,12 @@
 import { heroStats as placeholderHeroStats } from "@/lib/data";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { SITE_SETTINGS_QUERY } from "@/sanity/lib/queries";
+import { getSiteSettings } from "@/lib/repositories/site-settings";
 import HeroClient from "./HeroClient";
 
-type Settings = {
-  heroStats: { label: string; value: string }[] | null;
-  showreelUrl: string | null;
-  showreelVideoUrl: string | null;
-};
-
 export default async function Hero() {
-  const settings = await sanityFetch<Settings>(SITE_SETTINGS_QUERY);
+  const settings = await getSiteSettings();
+  const settingsHeroStats = settings?.heroStats as { label: string; value: string }[] | null;
   const heroStats =
-    settings?.heroStats && settings.heroStats.length > 0
-      ? settings.heroStats
-      : placeholderHeroStats;
+    settingsHeroStats && settingsHeroStats.length > 0 ? settingsHeroStats : placeholderHeroStats;
 
   return (
     <HeroClient

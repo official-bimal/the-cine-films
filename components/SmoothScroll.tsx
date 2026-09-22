@@ -7,12 +7,12 @@ import Lenis from "lenis";
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
-  const isStudio = pathname?.startsWith("/studio");
+  const isAdmin = pathname?.startsWith("/admin");
 
   useEffect(() => {
-    // Skip Lenis entirely on the Sanity Studio dashboard — the CMS has its
-    // own internal scroll areas that a global smooth-scroll hijack breaks.
-    if (isStudio) return;
+    // Skip Lenis entirely on the admin dashboard — a data-heavy CRM UI has
+    // its own internal scroll areas that a global smooth-scroll hijack breaks.
+    if (isAdmin) return;
 
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -37,7 +37,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [isStudio]);
+  }, [isAdmin]);
 
   return <>{children}</>;
 }
