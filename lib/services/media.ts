@@ -3,17 +3,21 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { put } from "@vercel/blob";
 import { db } from "@/lib/db";
 
 // ---------------------------------------------------------------------------
 // Storage provider abstraction. Phase 1 audit (Section 23) required the
 // frontend/admin never couple directly to a specific storage vendor — this
-// module is the only place that touches the filesystem. Swapping to S3/R2/
-// Vercel Blob later means rewriting `write()` below, nothing else in the app.
+// module is the only place that touches storage. Vercel's serverless
+// functions have a read-only filesystem (writes to public/uploads crash
+// there, and even /tmp writes wouldn't persist between invocations), so
+// production uses Vercel Blob; local dev — no BLOB_READ_WRITE_TOKEN — keeps
+// writing to disk, which is simpler for iterating without a token on hand.
 // ---------------------------------------------------------------------------
 
 interface StorageProvider {
-  write(filename: string, bytes: Buffer): Promise<{ url: string }>;
+  write(filename: string, bytes: Buffer, mimeType: string): Promise<{ url: string }>;
 }
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
@@ -26,7 +30,23 @@ class LocalFilesystemStorage implements StorageProvider {
   }
 }
 
-const storage: StorageProvider = new LocalFilesystemStorage();
+class VercelBlobStorage implements StorageProvider {
+  async write(filename: string, bytes: Buffer, mimeType: string) {
+    // addRandomSuffix: false — our filenames are already content-addressed
+    // (sha256 of the bytes), so re-uploading the same file reuses the same
+    // blob/URL instead of Blob minting a new random one each time.
+    const blob = await put(`uploads/${filename}`, bytes, {
+      access: "public",
+      contentType: mimeType,
+      addRandomSuffix: false,
+    });
+    return { url: blob.url };
+  }
+}
+
+const storage: StorageProvider = process.env.BLOB_READ_WRITE_TOKEN
+  ? new VercelBlobStorage()
+  : new LocalFilesystemStorage();
 
 // ---------------------------------------------------------------------------
 // Upload validation + persistence
@@ -80,7 +100,7 @@ export async function saveUpload(file: File, altText?: string) {
   const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
   const filename = `${hash}.${extensionFor(file.type)}`;
 
-  const { url } = await storage.write(filename, bytes);
+  const { url } = await storage.write(filename, bytes, file.type);
 
   const asset = await db.mediaAsset.create({
     data: {

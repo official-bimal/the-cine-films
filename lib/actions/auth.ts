@@ -22,12 +22,23 @@ export async function loginAction(formData: FormData) {
   }
 
   const { email, password } = parsed.data;
-  const admin = await db.adminUser.findUnique({ where: { email } });
 
   // Deliberately identical error for "no such user" and "wrong password" —
   // distinguishing them lets an attacker enumerate valid admin emails.
   const invalid = () =>
     redirect(`/admin/login?error=${encodeURIComponent("Incorrect email or password.")}&next=${encodeURIComponent(safeNext)}`);
+
+  let admin;
+  try {
+    admin = await db.adminUser.findUnique({ where: { email } });
+  } catch (error) {
+    // A raw connection blip (e.g. a serverless Postgres compute waking from
+    // idle) must not surface as a hard crash — same principle as the public
+    // read repositories' safeQuery(), applied here since this is the one
+    // unauthenticated database call in the whole admin surface.
+    console.error("[auth] login query failed:", error instanceof Error ? error.message : error);
+    redirect(`/admin/login?error=${encodeURIComponent("Something went wrong — please try again.")}&next=${encodeURIComponent(safeNext)}`);
+  }
 
   if (!admin) invalid();
   const valid = await verifyPassword(password, admin!.passwordHash);

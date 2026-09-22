@@ -7,6 +7,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "i.ytimg.com",
       },
+      {
+        // Admin-uploaded media in production (lib/services/media.ts) —
+        // Vercel's serverless functions have a read-only filesystem, so
+        // uploads go to Vercel Blob there instead of /public/uploads.
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
     ],
     // Serve AVIF where the browser supports it, WebP otherwise.
     formats: ["image/avif", "image/webp"],
