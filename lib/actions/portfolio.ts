@@ -16,6 +16,7 @@ import { portfolioProjectSchema } from "@/lib/validations/portfolio";
 import { slugify } from "@/lib/validations/shared";
 import { resolveMediaUrl } from "@/lib/actions/shared";
 import { MediaValidationError } from "@/lib/services/media";
+import { importInstagramThumbnail } from "@/lib/services/instagram";
 
 function buildInput(formData: FormData, thumbnailUrl: string) {
   const rawSlug = String(formData.get("slug") || "");
@@ -37,7 +38,10 @@ export async function createProjectAction(formData: FormData) {
   await requireAdminOrThrow();
 
   try {
-    const thumbnailUrl = await resolveMediaUrl(formData, "thumbnail");
+    const thumbnailUrl =
+      (await resolveMediaUrl(formData, "thumbnail")) ||
+      (await importInstagramThumbnail(String(formData.get("externalVideoUrl") || ""))) ||
+      "";
     const videoUrl = await resolveMediaUrl(formData, "video");
     const input = { ...buildInput(formData, thumbnailUrl), videoUrl };
 
@@ -67,7 +71,10 @@ export async function updateProjectAction(id: string, formData: FormData) {
   await requireAdminOrThrow();
 
   try {
-    const thumbnailUrl = await resolveMediaUrl(formData, "thumbnail");
+    const thumbnailUrl =
+      (await resolveMediaUrl(formData, "thumbnail")) ||
+      (await importInstagramThumbnail(String(formData.get("externalVideoUrl") || ""))) ||
+      "";
     const videoUrl = await resolveMediaUrl(formData, "video");
     const input = { ...buildInput(formData, thumbnailUrl), videoUrl };
 
