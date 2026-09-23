@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
 import { filterTabs } from "@/lib/data";
-import { instagramEmbedUrl, toEmbedUrl, youtubeThumbnails } from "@/lib/video";
+import { instagramEmbedUrl, isYoutubeShort, toEmbedUrl, youtubeThumbnails } from "@/lib/video";
 import { cn } from "@/lib/utils";
 import ScrollReveal from "./ScrollReveal";
 import MagneticButton from "./MagneticButton";
@@ -96,7 +96,7 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
     : instagramEmbedUrl(link)
       ? { Icon: InstagramIcon, label: "Reel" }
       : youtubeThumbnails(link)
-        ? { Icon: YoutubeIcon, label: "YouTube" }
+        ? { Icon: YoutubeIcon, label: isYoutubeShort(link) ? "Shorts" : "YouTube" }
         : null;
 
   const content = (
@@ -156,6 +156,7 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
 
   const embedUrl = lightbox?.externalVideoUrl ? toEmbedUrl(lightbox.externalVideoUrl) : null;
   const igEmbedUrl = lightbox?.externalVideoUrl ? instagramEmbedUrl(lightbox.externalVideoUrl) : null;
+  const isShort = Boolean(lightbox?.externalVideoUrl && isYoutubeShort(lightbox.externalVideoUrl));
 
   return (
     <section id="work" className="bg-ink py-24 lg:py-32">
@@ -245,7 +246,7 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className={cn("w-full", igEmbedUrl && !lightbox.videoUrl ? "max-w-[400px]" : "max-w-3xl")}
+              className={cn("w-full", (igEmbedUrl || isShort) && !lightbox.videoUrl ? "max-w-[400px]" : "max-w-3xl")}
             >
               {lightbox.videoUrl ? (
                 <video controls autoPlay className="aspect-video w-full rounded-lg border border-line bg-black">
@@ -265,7 +266,7 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
                   src={`${embedUrl}${embedUrl.includes("?") ? "&" : "?"}autoplay=1&rel=0`}
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen
-                  className="aspect-video w-full rounded-lg border border-line"
+                  className={cn("w-full rounded-lg border border-line", isShort ? "aspect-[9/16] max-h-[80vh]" : "aspect-video")}
                 />
               ) : (
                 <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-line placeholder-tile">

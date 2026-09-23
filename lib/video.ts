@@ -1,16 +1,10 @@
 // Best-effort conversion of a YouTube/Vimeo "watch" link (what someone
 // would naturally paste into the CMS) into an embeddable player URL.
 export function toEmbedUrl(url: string): string | null {
+  const ytId = youtubeId(url);
+  if (ytId) return `https://www.youtube.com/embed/${ytId}`;
   try {
     const u = new URL(url);
-    if (u.hostname.includes("youtube.com")) {
-      const id = u.searchParams.get("v");
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-    if (u.hostname === "youtu.be") {
-      const id = u.pathname.replace("/", "");
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
     if (u.hostname.includes("vimeo.com")) {
       const id = u.pathname.replace("/", "");
       return id ? `https://player.vimeo.com/video/${id}` : null;
@@ -21,14 +15,26 @@ export function toEmbedUrl(url: string): string | null {
   }
 }
 
+// Handles watch?v=, youtu.be/, and /shorts/, /embed/, /live/ links.
 function youtubeId(url: string): string | null {
   try {
     const u = new URL(url);
-    if (u.hostname.includes("youtube.com")) return u.searchParams.get("v");
-    if (u.hostname === "youtu.be") return u.pathname.replace("/", "") || null;
-    return null;
+    if (u.hostname === "youtu.be") return u.pathname.split("/")[1] || null;
+    if (!u.hostname.endsWith("youtube.com")) return null;
+    const path = u.pathname.match(/^\/(shorts|embed|live)\/([A-Za-z0-9_-]+)/);
+    return path ? path[2] : u.searchParams.get("v");
   } catch {
     return null;
+  }
+}
+
+// Shorts are portrait, so they get a portrait player like Instagram reels.
+export function isYoutubeShort(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.hostname.endsWith("youtube.com") && u.pathname.startsWith("/shorts/");
+  } catch {
+    return false;
   }
 }
 
