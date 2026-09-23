@@ -5,10 +5,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
 import { filterTabs } from "@/lib/data";
-import { toEmbedUrl, youtubeThumbnails } from "@/lib/video";
+import { instagramEmbedUrl, toEmbedUrl, youtubeThumbnails } from "@/lib/video";
 import { cn } from "@/lib/utils";
 import ScrollReveal from "./ScrollReveal";
 import MagneticButton from "./MagneticButton";
+import { InstagramIcon } from "./SocialIcons";
 
 type Project = {
   _id: string;
@@ -51,17 +52,33 @@ function ProjectThumb({ project }: { project: Project }) {
   if (project.videoUrl) {
     return <video src={`${project.videoUrl}#t=1`} muted playsInline preload="metadata" className={imgClass} />;
   }
+  // Instagram doesn't expose reel covers publicly, so without an uploaded
+  // thumbnail show a branded tile instead of an empty card.
+  if (project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl)) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#833ab4]/40 via-[#fd1d1d]/25 to-[#fcb045]/30">
+        <InstagramIcon className="h-16 w-16 text-white/40" />
+      </div>
+    );
+  }
   return null;
 }
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   const hasVideo = Boolean(project.videoUrl || project.externalVideoUrl);
+  const isInstagram = Boolean(project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl));
 
   const content = (
     <>
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-line placeholder-tile transition-colors duration-500 group-hover:border-gold/50 group-focus-visible:border-gold">
         <ProjectThumb project={project} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        {isInstagram && (
+          <span className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-offwhite backdrop-blur-sm">
+            <InstagramIcon className="h-3.5 w-3.5" />
+            Reel
+          </span>
+        )}
         {hasVideo && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors duration-500 group-hover:bg-black/35">
             <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/70 bg-black/30 text-offwhite backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-gold group-hover:bg-gold group-hover:text-ink">
@@ -107,6 +124,7 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
   const visible = showAll ? filtered : filtered.slice(0, INITIAL_COUNT);
 
   const embedUrl = lightbox?.externalVideoUrl ? toEmbedUrl(lightbox.externalVideoUrl) : null;
+  const igEmbedUrl = lightbox?.externalVideoUrl ? instagramEmbedUrl(lightbox.externalVideoUrl) : null;
 
   return (
     <section id="work" className="bg-ink py-24 lg:py-32">
@@ -196,12 +214,21 @@ export default function PortfolioClient({ projects }: { projects: Project[] }) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-3xl"
+              className={cn("w-full", igEmbedUrl && !lightbox.videoUrl ? "max-w-[400px]" : "max-w-3xl")}
             >
               {lightbox.videoUrl ? (
                 <video controls autoPlay className="aspect-video w-full rounded-lg border border-line bg-black">
                   <source src={lightbox.videoUrl} />
                 </video>
+              ) : igEmbedUrl ? (
+                // Instagram's player is portrait and doesn't support autoplay.
+                <iframe
+                  src={igEmbedUrl}
+                  allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                  allowFullScreen
+                  scrolling="no"
+                  className="h-[min(75vh,680px)] w-full rounded-lg border border-line bg-white"
+                />
               ) : embedUrl ? (
                 <iframe
                   src={`${embedUrl}${embedUrl.includes("?") ? "&" : "?"}autoplay=1&rel=0`}

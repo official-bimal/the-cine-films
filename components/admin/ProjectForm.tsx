@@ -61,7 +61,7 @@ export default function ProjectForm({
         )}
         <input type="file" name="thumbnailFile" accept="image/*" className={input} />
         <input type="hidden" name="thumbnailCurrent" value={project?.thumbnailUrl ?? ""} />
-        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, the YouTube link&apos;s own thumbnail is used.</p>
+        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, the YouTube link&apos;s own thumbnail is used. Recommended for Instagram reels, since Instagram doesn&apos;t share its cover image.</p>
       </div>
 
       <div className={fieldGroup}>
@@ -72,7 +72,7 @@ export default function ProjectForm({
       </div>
 
       <div className={fieldGroup}>
-        <label className={label} htmlFor="externalVideoUrl">Video Link (YouTube/Vimeo, alternative to an uploaded file)</label>
+        <label className={label} htmlFor="externalVideoUrl">Video Link (YouTube / Vimeo / Instagram Reel, alternative to an uploaded file)</label>
         <input id="externalVideoUrl" name="externalVideoUrl" defaultValue={project?.externalVideoUrl ?? ""} className={input} />
       </div>
 

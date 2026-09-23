@@ -42,3 +42,18 @@ export function youtubeThumbnails(url: string): { max: string; fallback: string 
     fallback: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
   };
 }
+
+// Instagram reel/post link -> Instagram's embeddable player. Accepts
+// /reel/, /reels/, /p/ and /tv/ links, with or without a username prefix.
+export function instagramEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.endsWith("instagram.com")) return null;
+    const match = u.pathname.match(/\/(reels?|p|tv)\/([A-Za-z0-9_-]+)/);
+    if (!match) return null;
+    const kind = match[1] === "p" ? "p" : "reel";
+    return `https://www.instagram.com/${kind}/${match[2]}/embed/`;
+  } catch {
+    return null;
+  }
+}
