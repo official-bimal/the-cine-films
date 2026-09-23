@@ -20,16 +20,22 @@ export async function importInstagramThumbnail(link: string | null | undefined):
     const pageUrl = embed.replace(/embed\/$/, "");
     const page = await fetch(pageUrl, {
       headers: { "User-Agent": CRAWLER_UA },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(5000),
     });
-    if (!page.ok) return null;
+    if (!page.ok) {
+      console.warn(`[instagram] ${pageUrl} returned ${page.status}`);
+      return null;
+    }
 
     const html = await page.text();
     const match = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/);
-    if (!match) return null;
+    if (!match) {
+      console.warn(`[instagram] no og:image on ${pageUrl}`);
+      return null;
+    }
     const imageUrl = match[1].replace(/&amp;/g, "&");
 
-    const image = await fetch(imageUrl, { signal: AbortSignal.timeout(8000) });
+    const image = await fetch(imageUrl, { signal: AbortSignal.timeout(5000) });
     const type = image.headers.get("content-type")?.split(";")[0] ?? "";
     if (!image.ok || !type.startsWith("image/")) return null;
 

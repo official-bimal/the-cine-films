@@ -53,3 +53,7 @@ export async function reorderProjects(orderedIds: string[]) {
     orderedIds.map((id, index) => db.portfolioProject.update({ where: { id }, data: { order: index } }))
   );
 }
+
+export async function setProjectThumbnail(id: string, thumbnailUrl: string) {
+  return db.portfolioProject.update({ where: { id }, data: { thumbnailUrl } });
+}
