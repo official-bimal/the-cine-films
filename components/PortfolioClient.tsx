@@ -9,7 +9,7 @@ import { instagramEmbedUrl, toEmbedUrl, youtubeThumbnails } from "@/lib/video";
 import { cn } from "@/lib/utils";
 import ScrollReveal from "./ScrollReveal";
 import MagneticButton from "./MagneticButton";
-import { InstagramIcon } from "./SocialIcons";
+import { InstagramIcon, YoutubeIcon } from "./SocialIcons";
 
 type Project = {
   _id: string;
@@ -66,17 +66,24 @@ function ProjectThumb({ project }: { project: Project }) {
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   const hasVideo = Boolean(project.videoUrl || project.externalVideoUrl);
-  const isInstagram = Boolean(project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl));
+  const link = project.externalVideoUrl;
+  const badge = !link
+    ? null
+    : instagramEmbedUrl(link)
+      ? { Icon: InstagramIcon, label: "Reel" }
+      : youtubeThumbnails(link)
+        ? { Icon: YoutubeIcon, label: "YouTube" }
+        : null;
 
   const content = (
     <>
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-line placeholder-tile transition-colors duration-500 group-hover:border-gold/50 group-focus-visible:border-gold">
         <ProjectThumb project={project} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-        {isInstagram && (
+        {badge && (
           <span className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-offwhite backdrop-blur-sm">
-            <InstagramIcon className="h-3.5 w-3.5" />
-            Reel
+            <badge.Icon className="h-3.5 w-3.5" />
+            {badge.label}
           </span>
         )}
         {hasVideo && (
