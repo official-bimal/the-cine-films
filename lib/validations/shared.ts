@@ -1,17 +1,14 @@
 import { z } from "zod";
 
 // HTML forms submit empty optional fields as "" rather than omitting them —
-// this turns "" into undefined so `.optional()` actually applies, instead of
-// every optional field needing its own `.or(z.literal(""))` escape hatch.
-export const optionalString = z.preprocess(
-  (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-  z.string().trim().optional()
-);
+// this turns "" into null so a cleared field (or a removed thumbnail/video)
+// actually clears the column. undefined would make Prisma skip the field and
+// silently keep the old value on update.
+const emptyToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
 
-export const optionalUrl = z.preprocess(
-  (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-  z.string().trim().url("Must be a valid URL.").optional()
-);
+export const optionalString = z.preprocess(emptyToNull, z.string().trim().nullish());
+
+export const optionalUrl = z.preprocess(emptyToNull, z.string().trim().url("Must be a valid URL.").nullish());
 
 export const slugField = z
   .string()

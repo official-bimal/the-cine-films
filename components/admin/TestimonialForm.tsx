@@ -1,6 +1,7 @@
 import type { Testimonial } from "@prisma/client";
 import Link from "next/link";
 import { btnPrimary, btnSecondary, cardPadded, fieldGroup, input, label, select, textarea } from "@/lib/admin-ui";
+import MediaField from "./MediaField";
 
 export default function TestimonialForm({
   testimonial,
@@ -54,14 +55,14 @@ export default function TestimonialForm({
       </div>
 
       <div className={fieldGroup}>
-        <label className={label}>Client Photo</label>
-        {testimonial?.photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={testimonial.photoUrl} alt="" className="mb-2 h-16 w-16 rounded-full object-cover" />
-        )}
-        <input type="file" name="photoFile" accept="image/*" className={input} />
-        <input type="hidden" name="photoCurrent" value={testimonial?.photoUrl ?? ""} />
-        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, initials are shown instead.</p>
+        <MediaField
+          name="photo"
+          label="Client Photo"
+          kind="image"
+          currentUrl={testimonial?.photoUrl}
+          previewClassName="h-16 w-16 rounded-full object-cover"
+          help={<>Optional — if empty, initials are shown instead.</>}
+        />
       </div>
 
       <div className="mt-6 flex gap-3">

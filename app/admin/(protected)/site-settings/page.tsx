@@ -2,6 +2,7 @@ import { getSiteSettings } from "@/lib/repositories/site-settings";
 import { updateSiteSettingsAction } from "@/lib/actions/site-settings";
 import { btnPrimary, cardPadded, fieldGroup, input, label, pageSubtitle, pageTitle, textarea } from "@/lib/admin-ui";
 import Banner from "@/components/admin/Banner";
+import MediaField from "@/components/admin/MediaField";
 
 type HeroStat = { label: string; value: string };
 
@@ -29,14 +30,14 @@ export default async function SiteSettingsPage({
         <section>
           <h2 className="mb-4 text-sm font-semibold text-neutral-900">Branding</h2>
           <div className={fieldGroup}>
-            <label className={label}>Logo</label>
-            {settings?.logoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={settings.logoUrl} alt="Current logo" className="mb-2 h-10 w-auto object-contain" />
-            )}
-            <input type="file" name="logoUrlFile" accept="image/*" className={input} />
-            <input type="hidden" name="logoUrlCurrent" value={settings?.logoUrl ?? ""} />
-            <p className="mt-1 text-xs text-neutral-400">Leave empty to keep the current logo (falls back to /images/logo.png if none is set).</p>
+            <MediaField
+              name="logoUrl"
+              label="Logo"
+              kind="image"
+              currentUrl={settings?.logoUrl}
+              previewClassName="h-10 w-auto object-contain"
+              help={<>Leave empty to keep the current logo (falls back to /images/logo.png if none is set).</>}
+            />
           </div>
           <div className={fieldGroup}>
             <label className={label} htmlFor="tagline">Tagline</label>
@@ -87,11 +88,13 @@ export default async function SiteSettingsPage({
         <section className="mt-8 border-t border-neutral-100 pt-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-900">Hero</h2>
           <div className={fieldGroup}>
-            <label className={label}>Showreel Video (background + popup)</label>
-            {settings?.showreelVideoUrl && <p className="mb-2 text-xs text-neutral-500">Current: {settings.showreelVideoUrl}</p>}
-            <input type="file" name="showreelVideoUrlFile" accept="video/*" className={input} />
-            <input type="hidden" name="showreelVideoUrlCurrent" value={settings?.showreelVideoUrl ?? ""} />
-            <p className="mt-1 text-xs text-neutral-400">Leave empty to keep the current video (falls back to the bundled showreel if none is set).</p>
+            <MediaField
+              name="showreelVideoUrl"
+              label="Showreel Video (background + popup)"
+              kind="video"
+              currentUrl={settings?.showreelVideoUrl}
+              help={<>Leave empty to keep the current video (falls back to the bundled showreel if none is set).</>}
+            />
           </div>
           <div className={fieldGroup}>
             <label className={label} htmlFor="showreelUrl">Showreel Link (YouTube/Vimeo, optional — used only for the popup)</label>
@@ -137,14 +140,14 @@ export default async function SiteSettingsPage({
             <textarea id="seoDescription" name="seoDescription" defaultValue={settings?.seoDescription ?? ""} className={textarea} />
           </div>
           <div className={fieldGroup}>
-            <label className={label}>Open Graph / Social Share Image</label>
-            {settings?.ogImageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={settings.ogImageUrl} alt="Current OG image" className="mb-2 h-20 w-auto rounded object-cover" />
-            )}
-            <input type="file" name="ogImageUrlFile" accept="image/*" className={input} />
-            <input type="hidden" name="ogImageUrlCurrent" value={settings?.ogImageUrl ?? ""} />
-            <p className="mt-1 text-xs text-neutral-400">1200×630 recommended. Shown when the site is shared on social media.</p>
+            <MediaField
+              name="ogImageUrl"
+              label="Open Graph / Social Share Image"
+              kind="image"
+              currentUrl={settings?.ogImageUrl}
+              previewClassName="h-20 w-auto rounded object-cover"
+              help={<>1200×630 recommended. Shown when the site is shared on social media.</>}
+            />
           </div>
         </section>
 

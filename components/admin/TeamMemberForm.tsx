@@ -1,6 +1,7 @@
 import type { TeamMember } from "@prisma/client";
 import Link from "next/link";
 import { btnPrimary, btnSecondary, cardPadded, checkboxRow, fieldGroup, input, label } from "@/lib/admin-ui";
+import MediaField from "./MediaField";
 
 export default function TeamMemberForm({
   member,
@@ -21,14 +22,14 @@ export default function TeamMemberForm({
       </div>
 
       <div className={fieldGroup}>
-        <label className={label}>Photo</label>
-        {member?.photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={member.photoUrl} alt="" className="mb-2 h-20 w-20 rounded-lg object-cover" />
-        )}
-        <input type="file" name="photoFile" accept="image/*" className={input} />
-        <input type="hidden" name="photoCurrent" value={member?.photoUrl ?? ""} />
-        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, initials are shown instead.</p>
+        <MediaField
+          name="photo"
+          label="Photo"
+          kind="image"
+          currentUrl={member?.photoUrl}
+          previewClassName="h-20 w-20 rounded-lg object-cover"
+          help={<>Optional — if empty, initials are shown instead.</>}
+        />
       </div>
 
       <div className={fieldGroup}>

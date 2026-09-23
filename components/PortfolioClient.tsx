@@ -42,7 +42,7 @@ function ProjectThumb({ project }: { project: Project }) {
   if (src && project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl)) {
     return (
       <>
-        <Image src={src} alt="" fill sizes="200px" className="scale-110 object-cover opacity-60 blur-2xl" />
+        <Image src={src} alt="" fill sizes="200px" className="scale-150 object-cover blur-xl brightness-75" />
         <Image
           src={src}
           alt=""

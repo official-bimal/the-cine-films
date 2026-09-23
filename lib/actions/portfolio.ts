@@ -34,14 +34,19 @@ function buildInput(formData: FormData, thumbnailUrl: string) {
   };
 }
 
+// An explicitly removed thumbnail stays removed rather than being refilled
+// from the Instagram reel's cover on the same save.
+async function resolveThumbnail(formData: FormData) {
+  const uploaded = await resolveMediaUrl(formData, "thumbnail");
+  if (uploaded || formData.get("thumbnailRemoved")) return uploaded;
+  return (await importInstagramThumbnail(String(formData.get("externalVideoUrl") || ""))) || "";
+}
+
 export async function createProjectAction(formData: FormData) {
   await requireAdminOrThrow();
 
   try {
-    const thumbnailUrl =
-      (await resolveMediaUrl(formData, "thumbnail")) ||
-      (await importInstagramThumbnail(String(formData.get("externalVideoUrl") || ""))) ||
-      "";
+    const thumbnailUrl = await resolveThumbnail(formData);
     const videoUrl = await resolveMediaUrl(formData, "video");
     const input = { ...buildInput(formData, thumbnailUrl), videoUrl };
 
@@ -71,10 +76,7 @@ export async function updateProjectAction(id: string, formData: FormData) {
   await requireAdminOrThrow();
 
   try {
-    const thumbnailUrl =
-      (await resolveMediaUrl(formData, "thumbnail")) ||
-      (await importInstagramThumbnail(String(formData.get("externalVideoUrl") || ""))) ||
-      "";
+    const thumbnailUrl = await resolveThumbnail(formData);
     const videoUrl = await resolveMediaUrl(formData, "video");
     const input = { ...buildInput(formData, thumbnailUrl), videoUrl };
 

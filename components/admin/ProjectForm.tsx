@@ -2,6 +2,7 @@ import type { PortfolioProject } from "@prisma/client";
 import { PROJECT_CATEGORIES } from "@/lib/validations/portfolio";
 import { btnPrimary, btnSecondary, cardPadded, fieldGroup, input, label, select } from "@/lib/admin-ui";
 import Link from "next/link";
+import MediaField from "./MediaField";
 
 export default function ProjectForm({
   project,
@@ -54,21 +55,17 @@ export default function ProjectForm({
       </div>
 
       <div className={fieldGroup}>
-        <label className={label}>Thumbnail Image</label>
-        {project?.thumbnailUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={project.thumbnailUrl} alt="" className="mb-2 h-24 w-auto rounded object-cover" />
-        )}
-        <input type="file" name="thumbnailFile" accept="image/*" className={input} />
-        <input type="hidden" name="thumbnailCurrent" value={project?.thumbnailUrl ?? ""} />
-        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, the YouTube link&apos;s own thumbnail is used. For Instagram links, the reel&apos;s cover is fetched automatically when you save.</p>
+        <MediaField
+          name="thumbnail"
+          label="Thumbnail Image"
+          kind="image"
+          currentUrl={project?.thumbnailUrl}
+          help={<>Optional — if empty, the YouTube link&apos;s own thumbnail is used. For Instagram links, the reel&apos;s cover is fetched automatically when you save (unless you just removed the thumbnail).</>}
+        />
       </div>
 
       <div className={fieldGroup}>
-        <label className={label}>Video File (optional)</label>
-        {project?.videoUrl && <p className="mb-2 text-xs text-neutral-500">Current: {project.videoUrl}</p>}
-        <input type="file" name="videoFile" accept="video/*" className={input} />
-        <input type="hidden" name="videoCurrent" value={project?.videoUrl ?? ""} />
+        <MediaField name="video" label="Video File (optional)" kind="video" currentUrl={project?.videoUrl} />
       </div>
 
       <div className={fieldGroup}>

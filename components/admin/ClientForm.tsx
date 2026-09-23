@@ -1,6 +1,7 @@
 import type { Client } from "@prisma/client";
 import Link from "next/link";
 import { btnPrimary, btnSecondary, cardPadded, checkboxRow, fieldGroup, input, label } from "@/lib/admin-ui";
+import MediaField from "./MediaField";
 
 export default function ClientForm({
   client,
@@ -17,14 +18,14 @@ export default function ClientForm({
       </div>
 
       <div className={fieldGroup}>
-        <label className={label}>Logo</label>
-        {client?.logoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={client.logoUrl} alt="" className="mb-2 h-12 w-auto object-contain" />
-        )}
-        <input type="file" name="logoFile" accept="image/*" className={input} />
-        <input type="hidden" name="logoCurrent" value={client?.logoUrl ?? ""} />
-        <p className="mt-1 text-xs text-neutral-400">Optional — if empty, the name is shown as text instead.</p>
+        <MediaField
+          name="logo"
+          label="Logo"
+          kind="image"
+          currentUrl={client?.logoUrl}
+          previewClassName="h-12 w-auto object-contain"
+          help={<>Optional — if empty, the name is shown as text instead.</>}
+        />
       </div>
 
       <div className={fieldGroup}>
