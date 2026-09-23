@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, X, ChevronDown } from "lucide-react";
+import { Play, X, ChevronDown, Volume2, VolumeX } from "lucide-react";
 import { toEmbedUrl } from "@/lib/video";
 import MagneticButton from "./MagneticButton";
 
@@ -36,8 +36,48 @@ export default function HeroClient({
   }, []);
   const embedUrl = showreelUrl ? toEmbedUrl(showreelUrl) : null;
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+
+  // The video is added after hydration, so make sure it's muted before
+  // playing: some browsers (iOS Safari) block autoplay otherwise.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  }, [loadVideo]);
+
+  const setVideoMuted = (next: boolean) => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = next;
+    setMuted(next);
+    if (!next) video.play().catch(() => {});
+  };
+
+  // Sound is opt-in and should stay with the hero: mute again once it's
+  // scrolled mostly out of view, or when the full reel opens on top of it.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || muted) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) setVideoMuted(true);
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [muted]);
+
+  useEffect(() => {
+    if (reelOpen) setVideoMuted(true);
+  }, [reelOpen]);
+
   return (
-    <section id="home" className="relative flex min-h-screen items-center overflow-hidden bg-ink py-28 sm:py-0">
+    <section ref={sectionRef} id="home" className="relative flex min-h-screen items-center overflow-hidden bg-ink py-28 sm:py-0">
       {/*
         REAL ASSET SLOT: this background video comes from the CMS (Site
         Settings -> Showreel Video File, or Showreel Link) at /studio. Until
@@ -47,13 +87,7 @@ export default function HeroClient({
         <div className="absolute inset-0">
           {loadVideo && (
             <video
-              // Added after hydration, so make sure it's muted before playing:
-              // some browsers (iOS Safari) block autoplay otherwise.
-              ref={(el) => {
-                if (!el) return;
-                el.muted = true;
-                el.play().catch(() => {});
-              }}
+              ref={videoRef}
               autoPlay
               loop
               muted
@@ -165,6 +199,24 @@ export default function HeroClient({
           </motion.div>
         </div>
       </div>
+
+      {/* Top right on phones, where the hero is taller than the screen and a
+          bottom-anchored button would sit below the fold. */}
+      {showreelVideoUrl && loadVideo && (
+        <motion.button
+          type="button"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.7, duration: 0.6 }}
+          onClick={() => setVideoMuted(!muted)}
+          aria-label={muted ? "Unmute video" : "Mute video"}
+          aria-pressed={!muted}
+          data-cursor-hover
+          className="absolute right-5 top-24 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/30 text-offwhite backdrop-blur-sm transition-colors hover:border-gold hover:text-gold sm:bottom-8 sm:right-6 sm:top-auto lg:right-16 xl:right-24"
+        >
+          {muted ? <VolumeX className="h-[18px] w-[18px]" /> : <Volume2 className="h-[18px] w-[18px]" />}
+        </motion.button>
+      )}
 
       <motion.div
         initial={{ opacity: 0 }}
