@@ -82,18 +82,7 @@ export default async function Footer() {
               <TiktokIcon className="h-5 w-5" />
             </a>
           </div>
-          <p className="font-mono text-xs text-muted">
-            Designed &amp; built by{" "}
-            <a
-              href="https://www.instagram.com/bimalbhandari_/"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cursor-hover
-              className="text-muted hover:text-gold"
-            >
-              Bimal Bhandari
-            </a>
-          </p>
+          <p className="font-mono text-xs text-muted">By The Cinefilms Team</p>
         </div>
       </div>
     </footer>
