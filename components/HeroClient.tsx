@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, X, ChevronDown } from "lucide-react";
 import { toEmbedUrl } from "@/lib/video";
@@ -21,6 +21,19 @@ export default function HeroClient({
   showreelUrl: string | null;
 }) {
   const [reelOpen, setReelOpen] = useState(false);
+  // The background video is ~6-8MB. Start it once the page has finished
+  // loading so it doesn't compete with the fonts, scripts and images needed
+  // for the first paint (the preloader covers the hero until then anyway).
+  const [loadVideo, setLoadVideo] = useState(false);
+  useEffect(() => {
+    if (document.readyState === "complete") {
+      setLoadVideo(true);
+      return;
+    }
+    const onLoad = () => setLoadVideo(true);
+    window.addEventListener("load", onLoad, { once: true });
+    return () => window.removeEventListener("load", onLoad);
+  }, []);
   const embedUrl = showreelUrl ? toEmbedUrl(showreelUrl) : null;
 
   return (
@@ -32,15 +45,24 @@ export default function HeroClient({
       */}
       {showreelVideoUrl ? (
         <div className="absolute inset-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src={showreelVideoUrl} />
-          </video>
+          {loadVideo && (
+            <video
+              // Added after hydration, so make sure it's muted before playing:
+              // some browsers (iOS Safari) block autoplay otherwise.
+              ref={(el) => {
+                if (!el) return;
+                el.muted = true;
+                el.play().catch(() => {});
+              }}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            >
+              <source src={showreelVideoUrl} />
+            </video>
+          )}
           {/* Mobile: bottom-heavy fade so centered text stays legible over the video. */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/55 lg:hidden" />
           {/* Desktop: gradient sits on the left where the copy lives, keeping the video clear on the right. */}
@@ -75,7 +97,7 @@ export default function HeroClient({
                 <motion.span
                   initial={{ y: "110%" }}
                   animate={{ y: "0%" }}
-                  transition={{ delay: 2.3 + i * 0.12, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 1.2 + i * 0.12, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                   className={i === HEADLINE.length - 1 ? "block text-gradient-gold" : "block"}
                 >
                   {line}
@@ -87,7 +109,7 @@ export default function HeroClient({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3, duration: 0.7 }}
+            transition={{ delay: 1.9, duration: 0.7 }}
             className="mx-auto mt-8 max-w-xl lg:mx-0 lg:mt-[clamp(1.25rem,4vh,2.5rem)] lg:max-w-none"
           >
             <p className="font-[family-name:var(--font-premium)] text-base font-medium leading-snug tracking-[-0.01em] text-offwhite [text-shadow:0_2px_18px_rgba(0,0,0,0.7)] sm:text-lg lg:text-[clamp(0.875rem,2.3vh,1.25rem)]">
@@ -106,7 +128,7 @@ export default function HeroClient({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.2, duration: 0.7 }}
+            transition={{ delay: 2.1, duration: 0.7 }}
             className="mt-10 flex flex-wrap items-center justify-center gap-5 lg:mt-[clamp(1.25rem,4vh,2.5rem)] lg:justify-start"
           >
             <MagneticButton
@@ -129,7 +151,7 @@ export default function HeroClient({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 3.5, duration: 0.7 }}
+            transition={{ delay: 2.4, duration: 0.7 }}
             className="mt-16 flex flex-wrap justify-center gap-10 border-t border-line pt-8 sm:mt-20 lg:mt-[clamp(1.5rem,6vh,5rem)] lg:justify-start lg:pt-[clamp(1rem,3vh,2rem)]"
           >
             {heroStats.map((s) => (
@@ -147,7 +169,7 @@ export default function HeroClient({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, y: [0, 10, 0] }}
-        transition={{ opacity: { delay: 3.8, duration: 0.6 }, y: { delay: 4, duration: 1.8, repeat: Infinity } }}
+        transition={{ opacity: { delay: 2.7, duration: 0.6 }, y: { delay: 2.9, duration: 1.8, repeat: Infinity } }}
         className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-muted sm:flex"
       >
         <span className="font-mono text-[10px] uppercase tracking-widest2">Scroll to Explore</span>

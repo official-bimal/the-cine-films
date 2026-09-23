@@ -5,7 +5,7 @@
 :root {
   --background: #050505;
   --foreground: #ffffff;
-  --font-display: "Clash Display", var(--font-body), Impact, sans-serif;
+  --font-display: var(--font-clash), var(--font-body), Impact, sans-serif;
 }
 
 * {

@@ -12,7 +12,9 @@ export default function Preloader() {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     const start = performance.now();
-    const duration = 2200;
+    // Long enough for the name to finish animating in (~1.2s), no longer:
+    // the preloader and the hero entrance delays used to add ~3s to every load.
+    const duration = 1100;
 
     let raf: number;
     function tick(now: number) {

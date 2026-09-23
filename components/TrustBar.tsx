@@ -17,6 +17,7 @@ function LogoGroup({ logos, hidden = false }: { logos: Logo[]; hidden?: boolean 
             <img
               src={logo.src}
               alt={hidden ? "" : logo.name}
+              decoding="async"
               style={{ height: logo.height }}
               className={`mx-12 w-auto max-w-[240px] object-contain transition-transform duration-500 hover:scale-110 md:mx-24 ${
                 logo.tint ? "brightness-0 invert" : ""
