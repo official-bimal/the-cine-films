@@ -38,11 +38,11 @@ function ProjectThumb({ project }: { project: Project }) {
 
   // Instagram covers are small portrait images (360x640), so cropping them to
   // fill a 16:9 card blows them up and blurs them. Show the whole cover
-  // instead, over a blurred copy of itself filling the sides.
+  // instead, on the Instagram-gradient tile with a logo on either side.
   if (src && project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl)) {
     return (
       <>
-        <Image src={src} alt="" fill sizes="200px" className="scale-150 object-cover blur-xl brightness-75" />
+        <InstagramTile />
         <Image
           src={src}
           alt=""
@@ -80,6 +80,17 @@ function ProjectThumb({ project }: { project: Project }) {
     );
   }
   return null;
+}
+
+// Background for Instagram cards that have a cover: the same gradient as the
+// no-cover tile, with the logo in the side areas the portrait cover leaves.
+function InstagramTile() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-between bg-gradient-to-br from-[#833ab4]/40 via-[#fd1d1d]/25 to-[#fcb045]/30 px-[9%]">
+      <InstagramIcon className="h-12 w-12 text-white/30" />
+      <InstagramIcon className="h-12 w-12 text-white/30" />
+    </div>
+  );
 }
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
