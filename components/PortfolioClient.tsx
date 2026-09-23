@@ -36,6 +36,24 @@ function ProjectThumb({ project }: { project: Project }) {
   const imgClass =
     "absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105";
 
+  // Instagram covers are small portrait images (360x640), so cropping them to
+  // fill a 16:9 card blows them up and blurs them. Show the whole cover
+  // instead, over a blurred copy of itself filling the sides.
+  if (src && project.externalVideoUrl && instagramEmbedUrl(project.externalVideoUrl)) {
+    return (
+      <>
+        <Image src={src} alt="" fill sizes="200px" className="scale-110 object-cover opacity-60 blur-2xl" />
+        <Image
+          src={src}
+          alt=""
+          fill
+          sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw"
+          className={imgClass.replace("object-cover", "object-contain")}
+        />
+      </>
+    );
+  }
+
   if (src) {
     return (
       <Image
