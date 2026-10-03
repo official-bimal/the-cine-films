@@ -136,7 +136,9 @@ export default async function RootLayout({
     // Falls back to the code-level default rather than shipping a literal
     // placeholder like "+977-XXXXXXXXXX" — Phase 1 audit Section 19/34: fill
     // in the real number in Site Settings before launch.
-    telephone: settings?.phone || siteConfig.phone,
+    // A saved value that still looks like a placeholder ("+977-XXXXXXXXXX", from the seed) is
+    // ignored, so structured data never publishes it.
+    telephone: settings?.phone && !/x{4,}/i.test(settings.phone) ? settings.phone : siteConfig.phone,
     email: settings?.email || siteConfig.email,
     address: {
       "@type": "PostalAddress",
