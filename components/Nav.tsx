@@ -1,5 +1,6 @@
 import { getSiteSettings } from "@/lib/repositories/site-settings";
 import NavClient from "./NavClient";
+import { hasInsights } from "@/lib/insights/content";
 
 export default async function Nav() {
   const settings = await getSiteSettings();
@@ -7,5 +8,5 @@ export default async function Nav() {
   // upload a different one in the dashboard (Site Settings → Logo) to override it.
   const logoUrl = settings?.logoUrl || "/images/logo.png";
 
-  return <NavClient logoUrl={logoUrl} />;
+  return <NavClient logoUrl={logoUrl} showInsights={hasInsights()} />;
 }

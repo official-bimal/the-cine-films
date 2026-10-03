@@ -107,3 +107,7 @@ npm run db:deploy          # apply migrations in production (non-interactive)
 npm run db:seed              # seed/re-seed placeholder content + admin account
 npm run db:studio             # Prisma Studio (visual DB browser)
 ```
+
+## Insights (/insights)
+
+Long-form guides live as markdown in `content/insights/` (reviewed in git, no database). Routes: `/insights`, `/insights/{category}`, `/insights/{category}/{slug}`. Copy `content/insights/_TEMPLATE.md` to add an article. Files starting with `_` or with `draft: true` are not published; the build fails on missing frontmatter or an unknown category. Category pages exist only when they contain an article, and the sitemap lists only what exists. Add statistics only with a source (`sources:` in frontmatter). Code: `lib/insights/*`, `components/insights/*`, `app/insights/*`.

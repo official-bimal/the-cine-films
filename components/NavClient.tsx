@@ -8,7 +8,7 @@ import { navLinks } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import MagneticButton from "./MagneticButton";
 
-export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
+export default function NavClient({ logoUrl, showInsights = false }: { logoUrl: string | null; showInsights?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -76,6 +76,17 @@ export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
                 </a>
               </li>
             ))}
+            {showInsights && (
+              <li>
+                <a
+                  href="/insights"
+                  data-cursor-hover
+                  className="font-nav text-[13px] font-normal uppercase tracking-[0.24em] text-muted transition-colors hover:text-gold"
+                >
+                  Insights
+                </a>
+              </li>
+            )}
           </ul>
 
           <div className="hidden lg:block">
@@ -127,10 +138,21 @@ export default function NavClient({ logoUrl }: { logoUrl: string | null }) {
                   </a>
                 </motion.li>
               ))}
+              {showInsights && (
+                <motion.li
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 * navLinks.length, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <a href="/insights" className="font-display text-4xl uppercase tracking-tight text-offwhite hover:text-gold">
+                    Insights
+                  </a>
+                </motion.li>
+              )}
               <motion.li
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 * navLinks.length, duration: 0.5 }}
+                transition={{ delay: 0.08 * (navLinks.length + 1), duration: 0.5 }}
               >
                 <a
                   href="#contact"

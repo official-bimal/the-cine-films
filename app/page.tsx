@@ -11,6 +11,7 @@ import Testimonials from "@/components/Testimonials";
 import Team from "@/components/Team";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 
 // Every section reads its content from the database (with a code-level
 // fallback where noted per component). Full page cache, revalidated once a
@@ -18,6 +19,10 @@ import Footer from "@/components/Footer";
 // lib/actions/*.ts), so changes show up immediately rather than waiting out
 // this window; this is just the ceiling for how stale a cold cache can get.
 export const revalidate = 60;
+
+// The root layout supplies title/description from Site Settings; this adds the canonical
+// URL for the home page (other pages set their own).
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function Home() {
   return (

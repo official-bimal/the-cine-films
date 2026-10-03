@@ -2,6 +2,7 @@ import Image from "next/image";
 import { InstagramIcon, FacebookIcon, YoutubeIcon, TiktokIcon } from "./SocialIcons";
 import { navLinks, serviceCategories, siteConfig } from "@/lib/data";
 import { getSiteSettings } from "@/lib/repositories/site-settings";
+import { hasInsights } from "@/lib/insights/content";
 
 export default async function Footer() {
   const settings = await getSiteSettings();
@@ -43,6 +44,13 @@ export default async function Footer() {
                   </a>
                 </li>
               ))}
+              {hasInsights() && (
+                <li>
+                  <a href="/insights" data-cursor-hover className="text-sm text-muted transition-colors hover:text-offwhite">
+                    Insights
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 
