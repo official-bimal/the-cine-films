@@ -19,7 +19,7 @@ export const siteConfig = {
   tagline: "Where Vision Meets the Frame",
   location: "Pokhara, Nepal",
   instagram: "@thecinefilms__",
-  phone: "+977-XXXXXXXXXX",
+  phone: "+977-9703602478",
   email: "info@thecinefilms.com",
   address: "Pokhara, Kaski, Nepal",
   social: {
